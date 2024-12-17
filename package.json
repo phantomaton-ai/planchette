@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "bot": "phantomaton planchette.smd",
     "test": "node --test"
   },
   "keywords": [
@@ -15,5 +16,12 @@
     "ouija"
   ],
   "author": "Phantomaton",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "phantomaton": "^0.0.5",
+    "phantomaton-anthropic": "^1.0.7",
+    "phantomaton-cli": "^1.0.5",
+    "phantomaton-conversations": "^1.0.1",
+    "phantomaton-system": "^1.0.0"
+  }
 }
