@@ -22,7 +22,7 @@
   "author": "Phantomaton",
   "license": "MIT",
   "dependencies": {
-    "phantomaton": "^0.0.5",
+    "phantomaton": "^0.0.6",
     "phantomaton-anthropic": "^1.0.7",
     "phantomaton-cli": "^1.0.5",
     "phantomaton-conversations": "^1.0.1",
