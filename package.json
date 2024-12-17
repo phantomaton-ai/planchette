@@ -1,6 +1,6 @@
 {
   "name": "planchette",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An LLM-powered blogging engine guided by supernatural inspiration",
   "main": "index.js",
   "type": "module",
