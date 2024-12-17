@@ -6,7 +6,11 @@
   "type": "module",
   "scripts": {
     "bot": "phantomaton planchette.smd",
-    "test": "node --test"
+    "all": "lovecraft -a",
+    "cov": "lovecraft -c",
+    "lnt": "lovecraft -l",
+    "pub": "lovecraft -a -p",
+    "tst": "lovecraft"
   },
   "keywords": [
     "blog",
@@ -23,5 +27,8 @@
     "phantomaton-cli": "^1.0.5",
     "phantomaton-conversations": "^1.0.1",
     "phantomaton-system": "^1.0.0"
+  },
+  "devDependencies": {
+    "lovecraft": "^1.1.0"
   }
 }
