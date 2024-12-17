@@ -43,9 +43,7 @@ This will launch an interactive writing companion powered by Claude AI.
 
 ## Features
 
-- Markdown-based blog post creation
 - LLM integration for content generation
-- Directive-based extensibility
 - Supernatural writing workflow 👻
 
 ## License
