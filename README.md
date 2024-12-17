@@ -6,12 +6,10 @@ Planchette is a lightweight, LLM-powered blogging engine that transforms writing
 
 Inspired by the mystical planchette of a Ouija board, this software enables writers to co-create content with AI, letting the digital spirit guide the cursor of creativity.
 
-## Features
+## Prerequisites
 
-- Markdown-based blog post creation
-- LLM integration for content generation
-- Directive-based extensibility
-- Supernatural writing workflow 👻
+- Node.js (v18+ recommended)
+- An Anthropic API key
 
 ## Installation
 
@@ -19,15 +17,36 @@ Inspired by the mystical planchette of a Ouija board, this software enables writ
 npm install planchette
 ```
 
-## Quick Start
+## Configuration
 
-```javascript
-import Planchette from 'planchette';
+Create a `.phantomaton/configuration.json` file in your project root:
 
-const blog = new Planchette();
-const post = blog.channel('my-supernatural-post');
-post.summon('Write an article about AI and creativity');
+```json
+{
+  "phantomaton-anthropic": {
+    "apiKey": "your-anthropic-api-key-here"
+  }
+}
 ```
+
+🚨 **Important**: Keep your API key secret! Do not commit this file to version control.
+
+## Usage
+
+Start the Planchette AI assistant:
+
+```bash
+npm run bot
+```
+
+This will launch an interactive writing companion powered by Claude AI.
+
+## Features
+
+- Markdown-based blog post creation
+- LLM integration for content generation
+- Directive-based extensibility
+- Supernatural writing workflow 👻
 
 ## License
 
