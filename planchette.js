@@ -6,6 +6,8 @@ import blog from './blog.js';
 import preamble from './preamble.js';
 import prefix from './prefix.js';
 
+const greenlist = ['list', 'files', 'read'];
+
 class Planchette {
   constructor(options = {}) {
     this.options = options;
@@ -15,7 +17,10 @@ class Planchette {
 
   commands() {
     return [
-      ...prefix(this.projects.commands, 'projects'),
+      ...prefix(
+        this.projects.commands.filter(({ name }) => greenlist.includes(name)),
+        'projects'
+      ),
       ...prefix(this.blog.commands, 'blog')
     ];
   }
