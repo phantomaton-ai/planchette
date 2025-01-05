@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 
+import conversations from 'phantomaton-conversations';
 import execution from 'phantomaton-execution';
 import plugins from 'phantomaton-plugins';
 import system from 'phantomaton-system';
@@ -21,11 +22,22 @@ export default plugins.create([
     desription: 'Lower-cases text'
   }),
 
+  conversations.assistant.decorator(
+    [],
+    () => (assistant) => ({
+      async converse(turns, message) {
+        const reply = await assistant.converse(turns, message);
+        console.log(chalk.magenta(assistant.preamble));
+        return reply;
+      }
+    })
+  ),
+
   system.system.decorator(
     [],
     () => (prompt) => () => {
       const value = prompt();
-      console.log(chalk.magenta(value));
+      console.log(chalk.blue(value));
       return value;
     }
   )
