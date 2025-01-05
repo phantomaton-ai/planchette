@@ -1,6 +1,8 @@
-class Commands {
-  constructor(blog) {
-    this.blog = blog;
+import ouijaboard from 'ouijaboard';
+
+class Blog {
+  constructor() {
+    this.blog = ouijaboard();
   }
 
   /**
