@@ -5,21 +5,21 @@ import plugins from 'phantomaton-plugins';
 import system from 'phantomaton-system';
 
 export default plugins.create([
-  plugins.define(execution.commands).as(() => [{
+  plugins.define(execution.command).as({
     name: 'capitalize',
     validate: (attributes, body) => !!attributes.text,
     execute: (attributes) => attributes.text.toUpperCase(),
     example: { attributes: { text: 'Test' } },
     desription: 'Capitalizes text'
-  }]),
+  }),
 
-  plugins.define(execution.commands).as(() => [{
+  plugins.define(execution.command).as({
     name: 'lowercase',
     validate: (attributes, body) => !!attributes.text,
     execute: (attributes) => attributes.text.toLowerCase(),
     example: { attributes: { text: 'Test' } },
     desription: 'Lower-cases text'
-  }]),
+  }),
 
   system.system.decorator(
     [],
