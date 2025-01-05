@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+
 import plugins from 'phantomaton-plugins';
 import system from 'phantomaton-system';
 
@@ -6,7 +8,7 @@ export default plugins.create([
     [],
     () => (prompt) => () => {
       const value = prompt();
-      console.log(value);
+      console.log(chalk.magenta(value));
       return value;
     }
   )
