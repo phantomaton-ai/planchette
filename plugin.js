@@ -5,6 +5,9 @@ import execution from 'phantomaton-execution';
 import plugins from 'phantomaton-plugins';
 import system from 'phantomaton-system';
 
+const preamble = assistant =>
+  assistant.preamble || (assistant.assistant && preamble(assistant.assistant));
+
 export default plugins.create([
   plugins.define(execution.command).as({
     name: 'capitalize',
@@ -22,15 +25,20 @@ export default plugins.create([
     desription: 'Lower-cases text'
   }),
 
-  conversations.assistant.decorator(
+  conversations.conversation.decorator(
     [],
-    () => (assistant) => ({
-      async converse(turns, message) {
-        const reply = await assistant.converse(turns, message);
-        console.log(chalk.magenta(assistant.preamble));
-        return reply;
-      }
-    })
+    () => conversation => turns => {
+      const instance = conversation(turns);
+      const advance = async () => {
+        const executed = preamble(instance);
+        if (executed) {
+          console.log(chalk.magenta(executed) + '\n');
+        }
+        const result = await instance.advance();
+        return result;
+      };
+      return { advance };
+    }
   ),
 
   system.system.decorator(
