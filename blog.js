@@ -1,3 +1,4 @@
+import aleister from 'aleister';
 import ouijaboard from 'ouijaboard';
 
 class Blog {
@@ -79,3 +80,5 @@ class Blog {
     return this.blog.publish(post);
   }
 }
+
+export default aleister(Blog);

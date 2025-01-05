@@ -2,17 +2,22 @@ import chalk from 'chalk';
 
 import projects from 'phantomaton-projects';
 
+import blog from './blog.js';
 import preamble from './preamble.js';
 import prefix from './prefix.js';
 
 class Planchette {
   constructor(options = {}) {
     this.options = options;
+    this.blog = blog();
     this.projects = projects();
   }
 
   commands() {
-    return prefix(this.projects.commands, 'projects');
+    return [
+      ...prefix(this.projects.commands, 'projects'),
+      ...prefix(this.blog.commands, 'blog')
+    ];
   }
 
   conversation(wrapped) {
