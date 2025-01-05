@@ -1,14 +1,17 @@
 import chalk from 'chalk';
 
+import projects from 'phantomaton-projects';
+
 import preamble from './preamble.js';
 
 class Planchette {
   constructor(options = {}) {
     this.options = options;
+    this.projects = projects();
   }
 
   commands() {
-    return [];
+    return this.projects.commands;
   }
 
   conversation(wrapped) {
