@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import projects from 'phantomaton-projects';
 
 import preamble from './preamble.js';
+import prefix from './prefix.js';
 
 class Planchette {
   constructor(options = {}) {
@@ -11,7 +12,7 @@ class Planchette {
   }
 
   commands() {
-    return this.projects.commands;
+    return prefix(this.projects.commands, 'projects');
   }
 
   conversation(wrapped) {
