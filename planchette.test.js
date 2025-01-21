@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { expect } from 'lovecraft';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
