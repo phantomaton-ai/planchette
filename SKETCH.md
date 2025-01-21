@@ -1,4 +1,4 @@
-Planchette is a tool for creating, editing, and managing projects, targeted at large language models. It is sort of like an operarting system for LLMs.
+Planchette is a tool for creating, editing, and managing projects, targeted at large language models. It is sort of like an operarting system for LLMs. The name references the pointer used on a ouija board, as a metaphor for a tool used which lends agency to an unseen force.
 
 # Concept
 
