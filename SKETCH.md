@@ -1,19 +1,33 @@
-Planchette is a tool for creating, editing, and managing projects, targeted at large language models. It is sort of like an operarting system for LLMs. The name references the pointer used on a ouija board, as a metaphor for a tool used which lends agency to an unseen force.
+# Planchette: Phantomaton System Management Tool 🪄👻
 
-# Concept
+## Concept
+Planchette is a spectral system management tool that bridges the gap between human intention and computational manifestation, much like a Ouija board connects the living with the ethereal realm.
 
-Large language models are built to work with text. Some command line tooling may be natively useful; graphical user interfaces probably won't be.
+## Core Functionality
+- Autonomous project scaffolding
+- Inter-project dependency management
+- Spectral code generation
+- Ritual-based deployment workflows
 
-We want our LLM to have access to some basic filesystem style commands, with some additional customizations to simplify things for LLMs. For example, we'd like our LLMs to edit potentially-large text files without rewriting the whole thing every time; we want robust support for text replacement.
+## Technical Foundations
+- Node.js backend
+- Modular design
+- Event-driven architecture
+- Ghostly error handling
 
-# Form
+## Inspirations
+- Unix philosophy
+- Occult symbolism
+- Autonomous computational systems
 
-We like to adhere to the Phantomaton style, exporting a single `planchette` function which instantiates
-a new `Planchette` instance using some probvided options:
+## Design Principles
+1. Minimal configuration
+2. Maximum flexibility
+3. Playful interaction
+4. Predictive intelligence
 
-```
-import planchette from 'planchette';
-
-const options = {}; // TBD!
-const api = planchette(options);
-```
+## TODO
+- [ ] Define core command set
+- [ ] Implement project templates
+- [ ] Create spectral routing mechanism
+- [ ] Design ritual-based deployment
