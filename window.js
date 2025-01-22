@@ -9,7 +9,7 @@ export default class Window {
    * @param {number|string|RegExp} [options.start] - Start of window
    * @param {number|string|RegExp} [options.end] - End of window
    */
-  constructor(options) {
+  constructor(options = {}) {
     // Validate and normalize input
     if (options instanceof RegExp) {
       this.regex = options;

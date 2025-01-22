@@ -8,7 +8,7 @@ export default class Workspace {
      * Map of open files to their current windows/contexts
      * @type {Map<string, object>}
      */
-    this.windows = new Map();
+    this.windows = {};
 
     /**
      * List of currently open files
@@ -25,10 +25,6 @@ export default class Workspace {
   open(file, window = null) {
     if (!this.files.includes(file)) {
       this.files.push(file);
-    }
-    
-    if (window !== null) {
-      this.windows.set(file, window);
     }
   }
 

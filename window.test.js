@@ -1,6 +1,12 @@
 import { expect } from 'lovecraft';
 import Window from './window.js';
 
+const multilineContent = `first line
+second line
+third line
+fourth line
+fifth line`;
+
 describe('Window', () => {
   describe('Regex Window', () => {
     it('should read content matching a regex', () => {
@@ -19,12 +25,6 @@ describe('Window', () => {
   });
 
   describe('Line-based Window', () => {
-    const multilineContent = `first line
-second line
-third line
-fourth line
-fifth line`;
-
     it('should create a window with start and end', () => {
       const window = new Window({ 
         start: 1, 
@@ -62,6 +62,16 @@ fifth line`);
       expect(new Window({ start: 4 }).read(multilineContent)).to.equal('fifth line');
       expect(new Window({ end: 0 }).read(multilineContent)).to.equal('first line');
       expect(new Window({ end: 5 }).read(multilineContent)).to.equal(multilineContent);
+    });
+  });
+
+  describe('Unspecified Window', () => {
+    it('reads full content', () => {
+      expect(new Window().read(multilineContent)).to.equal(multilineContent);
+    });
+
+    it('replaces full content', () => {
+      expect(new Window().replace(multilineContent, 'foo')).to.equal('foo');      
     });
   });
 
