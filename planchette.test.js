@@ -9,7 +9,7 @@ describe('Planchette', () => {
 
   it('should create a planchette instance', () => {
     const api = planchette({ rootDir: tempDir });
-    expect(api).not.to.be.undefined;
+    expect(api).toBeTruthy();
   });
 
   it('should write and read a file', async () => {
@@ -20,7 +20,7 @@ describe('Planchette', () => {
     await api.write(testFile, testContent);
     const readContent = await api.read(testFile);
 
-    expect(readContent).to.equal(testContent);
+    expect(readContent).toBe(testContent);
   });
 
   it('should replace text in a file', async () => {
@@ -32,6 +32,6 @@ describe('Planchette', () => {
     await api.replace(testFile, 'brown', 'spectral');
 
     const updatedContent = await api.read(testFile);
-    expect(updatedContent).to.equal('The quick spectral fox');
+    expect(updatedContent).toBe('The quick spectral fox');
   });
 });

@@ -44,27 +44,15 @@ class Planchette {
   }
 
   /**
-   * Replace text in a file with advanced options
+   * Replace specific text in a file
    * @param {string} filePath - Path to the file
-   * @param {string|RegExp} search - Text or regex to search for
-   * @param {string|Function} replace - Replacement text or transformation function
+   * @param {string} search - Text to search for
+   * @param {string} replace - Replacement text
    */
   async replace(filePath, search, replace) {
-    let content = await this.read(filePath);
-    
-    // Handle different replacement scenarios
-    if (typeof replace === 'function') {
-      // If replace is a function, pass matched content to it
-      content = content.replace(search, replace);
-    } else if (search instanceof RegExp) {
-      // If search is a regex, use standard regex replacement
-      content = content.replace(search, replace);
-    } else {
-      // Simple string replacement
-      content = content.split(search).join(replace);
-    }
-
-    await this.write(filePath, content);
+    const content = await this.read(filePath);
+    const newContent = content.replace(search, replace);
+    await this.write(filePath, newContent);
   }
 }
 
