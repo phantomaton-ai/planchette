@@ -1,4 +1,4 @@
-Planchette is a tool for creating, editing, and managing projects, targeted at large language models. It is sort of like an operarting system for LLMs. The name references the pointer used on a ouija board, as a metaphor for a tool used which lends agency to an unseen force.
+Planchette is a tool for creating, editing, and managing projects, targeted at large language models. It is sort of like an operating system or an IDE for LLMs. The name references the pointer used on a ouija board, as a metaphor for a tool used which lends agency to an unseen force.
 
 # Concept
 
@@ -10,6 +10,8 @@ We want our LLM to have access to some basic filesystem style commands, with som
 
 ## Session
 
+A session represents an LLM's current working system environment, similar to a command-line shell session. It offers the following API:
+
 - `close(file)`: Remove a file from the active workspace.
 - `edit(file, content, window?)`: Modify the content of a file
 - `execute(command, input?)`: Execute a shell command.
@@ -19,6 +21,8 @@ We want our LLM to have access to some basic filesystem style commands, with som
 - `workspace`: An instance of the session workspace.
 
 ### Workspace
+
+The primary use case of the workspace is to populate an LLM's system prompt with "open files", analogous to the tabs in a text editor or IDE.
 
 - `files`: A list of open files.
 - `windows`: A map of open files to their windows.
