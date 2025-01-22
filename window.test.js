@@ -42,13 +42,13 @@ fifth line`;
       });
       
       const result = window.read(multilineContent);
-      expect(result).to.equal('second line\nthird line\nfourth line');
+      expect(result).to.equal('second line\nthird line\nfourth');
     });
 
     it('should replace content in a line-based window', () => {
       const window = new Window({ 
         start: 1, 
-        end: 3 
+        end: 3
       });
       
       const result = window.replace(multilineContent, 'replacement');
@@ -58,11 +58,10 @@ fifth line`);
     });
 
     it('should handle default start/end', () => {
-      const windowStart = new Window({ start: 0 });
-      expect(windowStart.read(multilineContent)).toBe('first line');
-
-      const windowEnd = new Window({ end: 4 });
-      expect(windowEnd.read(multilineContent)).to.equal(multilineContent);
+      expect(new Window({ start: 0 }).read(multilineContent)).to.equal(multilineContent);
+      expect(new Window({ start: 4 }).read(multilineContent)).to.equal('fifth line');
+      expect(new Window({ end: 0 }).read(multilineContent)).to.equal('first line');
+      expect(new Window({ end: 5 }).read(multilineContent)).to.equal(multilineContent);
     });
   });
 

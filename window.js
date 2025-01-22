@@ -8,7 +8,6 @@ export default class Window {
    * @param {Object|RegExp} options - Window definition
    * @param {number|string|RegExp} [options.start] - Start of window
    * @param {number|string|RegExp} [options.end] - End of window
-   * @param {RegExp} [options.regex] - Regex to define window
    */
   constructor(options) {
     // Validate and normalize input
@@ -18,7 +17,6 @@ export default class Window {
       // Use undefined if not specified to allow default behavior
       this.start = options.start;
       this.end = options.end;
-      this.regex = options.regex;
     } else {
       throw new Error('Invalid window definition');
     }
@@ -36,20 +34,8 @@ export default class Window {
       return match ? match[0] : '';
     }
 
-    // Line-based window
-    const lines = content.split('\n');
-    
-    // Resolve start index, defaulting to 0 if not specified
-    const startIndex = this.start !== undefined 
-      ? this._resolveIndex(lines, this.start) 
-      : 0;
-    
-    // Resolve end index, defaulting to last line if not specified
-    const endIndex = this.end !== undefined
-      ? this._resolveIndex(lines, this.end)
-      : lines.length - 1;
-
-    return lines.slice(startIndex, endIndex + 1).join('\n');
+    const { start, end } = this._resolve(content);
+    return content.slice(start, end);
   }
 
   /**
@@ -64,41 +50,46 @@ export default class Window {
       return content.replace(this.regex, replacement);
     }
 
-    // Line-based window
-    const lines = content.split('\n');
+    const { start, end } = this._resolve(content);
+    const before = content.slice(0, start);
+    const after = content.slice(end);
     
-    // Resolve start index, defaulting to 0 if not specified
-    const startIndex = this.start !== undefined 
-      ? this._resolveIndex(lines, this.start) 
-      : 0;
-    
-    // Resolve end index, defaulting to last line if not specified
-    const endIndex = this.end !== undefined
-      ? this._resolveIndex(lines, this.end)
-      : lines.length - 1;
+    return [before, replacement, after].join('');
+  }
 
-    lines.splice(startIndex, endIndex - startIndex + 1, replacement);
-    return lines.join('\n');
+  _resolve(content) {
+    const start = this._resolveIndex(content, this.start, true);
+    const end = this._resolveIndex(content, this.end, false, start);
+    return { start, end };
   }
 
   /**
    * Resolve an index for windowing
    * @private
-   * @param {string[]} lines - File lines
+   * @param {string} contennt - File content
    * @param {number|string|RegExp} index - Index specifier
-   * @returns {number} Resolved line number
+   * @returns {number} Resolved character index
    */
-  _resolveIndex(lines, index) {
-    if (typeof index === 'number') return index;
+  _resolveIndex(content, index, starting, position = 0) {
+    if (index === undefined) {
+      return starting ? 0 : content.length;
+    }
+
+    if (typeof index === 'number') {
+      const extra = starting ? 0 : 1;
+      const lines = content.split('\n').slice(0, index + extra);
+      return lines.reduce((resolved, line) => resolved + line.length, lines.length - extra);
+    }
     
     if (typeof index === 'string') {
-      const lineIndex = lines.findIndex(line => line.includes(index));
-      return lineIndex !== -1 ? lineIndex : 0;
+      const extra = starting ? 0 : index.length;
+      return content.indexOf(index, position) + extra;
     }
 
     if (index instanceof RegExp) {
-      const lineIndex = lines.findIndex(line => index.test(line));
-      return lineIndex !== -1 ? lineIndex : 0;
+      const match = content.slice(position).match(index).index;
+      const extra = starting ? 0 : match[0].length;
+      return match.index + position + extra;
     }
 
     return 0;
