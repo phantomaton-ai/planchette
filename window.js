@@ -15,6 +15,7 @@ export default class Window {
     if (options instanceof RegExp) {
       this.regex = options;
     } else if (typeof options === 'object') {
+      // Use undefined if not specified to allow default behavior
       this.start = options.start;
       this.end = options.end;
       this.regex = options.regex;
@@ -37,8 +38,16 @@ export default class Window {
 
     // Line-based window
     const lines = content.split('\n');
-    const startIndex = this._resolveIndex(lines, this.start);
-    const endIndex = this._resolveIndex(lines, this.end);
+    
+    // Resolve start index, defaulting to 0 if not specified
+    const startIndex = this.start !== undefined 
+      ? this._resolveIndex(lines, this.start) 
+      : 0;
+    
+    // Resolve end index, defaulting to last line if not specified
+    const endIndex = this.end !== undefined
+      ? this._resolveIndex(lines, this.end)
+      : lines.length - 1;
 
     return lines.slice(startIndex, endIndex + 1).join('\n');
   }
@@ -57,8 +66,16 @@ export default class Window {
 
     // Line-based window
     const lines = content.split('\n');
-    const startIndex = this._resolveIndex(lines, this.start);
-    const endIndex = this._resolveIndex(lines, this.end);
+    
+    // Resolve start index, defaulting to 0 if not specified
+    const startIndex = this.start !== undefined 
+      ? this._resolveIndex(lines, this.start) 
+      : 0;
+    
+    // Resolve end index, defaulting to last line if not specified
+    const endIndex = this.end !== undefined
+      ? this._resolveIndex(lines, this.end)
+      : lines.length - 1;
 
     lines.splice(startIndex, endIndex - startIndex + 1, replacement);
     return lines.join('\n');
@@ -72,10 +89,6 @@ export default class Window {
    * @returns {number} Resolved line number
    */
   _resolveIndex(lines, index) {
-    if (index === undefined) {
-      return index === 'start' ? 0 : lines.length - 1;
-    }
-
     if (typeof index === 'number') return index;
     
     if (typeof index === 'string') {
