@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { expect } from 'lovecraft';
 import Window from './window.js';
 
 describe('Window', () => {
