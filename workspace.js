@@ -3,10 +3,12 @@
  * @module workspace
  */
 export default class Workspace {
-  constructor() {
+  constructor(session) {
+    this.session = session;
+
     /**
      * Map of open files to their current windows/contexts
-     * @type {Map<string, object>}
+     * @type {Record<string, Window>}
      */
     this.windows = {};
 
@@ -22,10 +24,11 @@ export default class Workspace {
    * @param {string} file - Path to the file
    * @param {object|string|RegExp} [window] - Context window definition
    */
-  open(file, window = null) {
+  open(file, window = undefined) {
     if (!this.files.includes(file)) {
       this.files.push(file);
     }
+    this.windows[file] = window;
   }
 
   /**
@@ -34,16 +37,18 @@ export default class Workspace {
    */
   close(file) {
     this.files = this.files.filter(f => f !== file);
-    this.windows.delete(file);
+    delete this.windows.delete[file];
   }
 
   /**
    * Read contents of open files with their windows
-   * @returns {Map<string, string>} Map of file contents within their windows
+   * @returns {Promise<object[]>} File contents, within their windows
    */
   read() {
-    // TODO: Implement actual windowing logic
-    const contents = new Map();
-    return contents;
+    return Promise.all(this.files.map(async file => {
+      const window = this.windows[file];
+      const content = await this.session.read(file, window);
+      return {file, content, window};
+    }));
   }
 }
