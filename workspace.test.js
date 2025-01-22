@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { expect } from 'lovecraft';
 import Workspace from './workspace.js';
 
 describe('Workspace', () => {

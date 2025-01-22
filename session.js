@@ -111,9 +111,9 @@ export default class Session {
    * @param {string} file - Path to the file
    */
   async remove(file) {
-    const fullPath = path.resolve(this.rootDir, file);
-    await fs.unlink(fullPath);
-    this.close(file);
+    // const fullPath = path.resolve(this.rootDir, file);
+    // await fs.unlink(fullPath);
+    // this.close(file);
   }
 
   /**
