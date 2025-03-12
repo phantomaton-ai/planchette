@@ -126,6 +126,10 @@ Opinionated hypothesis: Exposing traditional GUIs to LLMs is generally inefficie
 
 ## Instance
 
+* `click(target)`
+* `hover(target)`
+* `drag(target)`
+* `type(target, text)`
 * `menu() -> Action[]`
 * `view()`
 
@@ -141,8 +145,6 @@ Opinionated hypothesis: Exposing traditional GUIs to LLMs is generally inefficie
 
 ### Editor
 
-* `append(content)`
-* `edit(target, content)`
 * `revert()`
 * `save()`
 
