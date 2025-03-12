@@ -72,6 +72,7 @@ Opinionated hypothesis: Exposing traditional GUIs to LLMs is generally inefficie
 * `hide(index)`
 * `paste(index, target)`
 * `scroll(index, position)` TODO: Position?
+* `shortcut(hotkey)`
 * `show(index)`
 * `open(application, options, body)`
 * `view(size)`
@@ -101,9 +102,31 @@ Opinionated hypothesis: Exposing traditional GUIs to LLMs is generally inefficie
 
 * `run(options, body) -> Instance`
 
+## Action
+
+* `name`
+* `body`
+* `description`
+* `examples`
+* `hotkey`
+* `options`
+* `perform(options, body)`
+
+### Example
+
+* `description`
+* `options`
+
+### Option
+
+* `name`
+* `description`
+* `type`
+* `validate(value)`
+
 ## Instance
 
-* `menu()`
+* `menu() -> Action[]`
 * `view()`
 
 ### Browser
