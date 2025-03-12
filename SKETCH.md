@@ -51,3 +51,78 @@ import planchette from 'planchette';
 const options = {}; // TBD!
 const session = planchette(options);
 ```
+
+---
+
+# Planchette 2
+
+Vision for a future maturation: Planchette as an agent-oriented windowing environment. GNOME for LLMs.
+
+Opinionated hypothesis: Exposing traditional GUIs to LLMs is generally inefficient and over-complicated; building LLM-oriented user interfaces around a paucity of text content will improve general token efficiency during the performance of complicated tasks, as well as effectiveness due to support for pruning of less-relevant semantic content.
+
+## Session
+
+* `applications`
+* `clipboard`
+* `configuration`
+* `close(index)`
+* `copy(index, target)`
+* `focus(index)`
+* `focused`: Window
+* `hide(index)`
+* `paste(index, target)`
+* `scroll(index, position)` TODO: Position?
+* `show(index)`
+* `open(application, options, body)`
+* `view(size)`
+* `windows`
+
+### Clipboard
+
+* `content`
+
+### Configuration
+
+* `applications`: Available application
+* `windows`: Number; maximum windows available
+
+### Window
+
+* `application`
+* `instance`
+* `content`
+* `title`
+* `width`
+* `height`
+* `scroll`
+* `size`
+
+## Application
+
+* `run(options, body) -> Instance`
+
+## Instance
+
+* `menu()`
+* `view()`
+
+### Browser
+
+* `back()`
+* `forward()`
+* `navigate(url)`
+* `navigation`
+* `click(target)`
+* `hover(target)`
+* `type(text)`
+
+### Editor
+
+* `append(content)`
+* `edit(target, content)`
+* `revert()`
+* `save()`
+
+### Terminal
+
+* `execute(command)`
