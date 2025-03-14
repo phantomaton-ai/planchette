@@ -21,243 +21,366 @@ Planchette follows a modular architecture with the following key components:
         ▼
 ┌────────────────┐
 │    Session     │  Manages the LLM's interaction context
-└───────┬────────┘
-        │
-        ▼
-┌────────────────┐     ┌────────────────┐
-│   Commander    │◄────┤   Workspace    │  Command interface for LLM operations
-└───────┬────────┘     └────────────────┘
-        │
-        ▼
-┌────────────────┐     ┌────────────────┐
-│     Window     │◄────┤    Editor      │  File views and text operations
-└────────────────┘     └────────────────┘
+└─────┬───┬──────┘
+      │   │
+      │   ▼
+      │ ┌────────────────┐
+      └►│   Interface    │  Command interface for LLM operations
+        └───────┬────────┘
+                │
+                ▼
+        ┌────────────────┐
+        │   Workspace    │  Manages open files and windows
+        └───────┬────────┘
+                │
+                ▼
+        ┌────────────────┐
+        │     Window     │  Provides views into files
+        └────────────────┘
 ```
+
+## Component Responsibilities
 
 ### Session
 
-The Session manages the LLM's current working system environment, similar to a shell session:
+The Session owns the Interface and Workspace, serving as the primary external API:
 
-- Maintains a workspace state
-- Holds a reference to the commander
-- Serves as the primary external API
+- Initializes and configures the workspace and interface
+- Exposes command execution to external callers
+- Generates system prompts for LLMs
 
 ```javascript
 class Session {
-  constructor(options = {})
+  constructor(options = {}) {
+    this.workspace = new Workspace(options);
+    this.interface = new Interface(this.workspace);
+  }
   
-  // Public API - delegates to Commander
-  async run(command, body)
-  
-  // Configuration
-  config(options)
+  // Primary API method
+  async run(command, body) {
+    return await this.interface[command](body);
+  }
   
   // System prompt generation
-  prompt()
+  prompt() {
+    return this.workspace.format();
+  }
 }
 ```
 
-### Commander
+### Interface
 
-The Commander implements all command handlers and provides the interface for LLM operations:
-
-- Exposes all command methods directly supporting the LLM interface
-- Translates high-level commands to file operations
-- Manages cursor and selection state through window objects
+The Interface implements all LLM commands, delegating to the Workspace and Windows:
 
 ```javascript
-class Commander {
-  constructor(workspace, options = {})
+class Interface {
+  constructor(workspace) {
+    this.workspace = workspace;
+  }
   
   // File commands
-  open(file)
-  close(file)
-  read(file, opts = {})
-  edit(content, opts = {})
-  remove(file)
+  open(file) {
+    this.workspace.open(file);
+    this.workspace.focus(file);
+  }
+  
+  close(file) {
+    this.workspace.close(file);
+  }
   
   // Navigation commands
-  focus(file)
-  before(target)
-  after(target)
-  select(start, end, opts = {})
-  drag(target, opts = {})
+  focus(file) {
+    this.workspace.focus(file);
+  }
+  
+  before(target) {
+    this.workspace.current().before(target);
+  }
+  
+  after(target) {
+    this.workspace.current().after(target);
+  }
+  
+  // Selection commands
+  select(start, end) {
+    this.workspace.current().select(start, end);
+  }
+  
+  drag(target, opts = {}) {
+    // Uses cursor position as start point
+    this.workspace.current().drag(target, opts);
+  }
+  
+  // Editing commands
+  edit(content) {
+    const window = this.workspace.current();
+    if (window.hasSelection()) {
+      window.replace(content);
+    } else {
+      window.insert(content);
+    }
+  }
   
   // View commands
-  scroll(lines)
+  scroll(lines) {
+    this.workspace.current().scroll(lines);
+  }
   
   // System commands
-  exec(command, input = null)
+  async exec(command) {
+    // Execute system command
+    // Implementation details...
+  }
 }
 ```
 
 ### Workspace
 
-The Workspace manages open files and their display state:
-
-- Tracks open files and windows
-- Maintains focused window state
-- Provides window access to the Commander
+The Workspace manages open files, windows, and focus state:
 
 ```javascript
 class Workspace {
-  constructor(options = {})
+  constructor(options = {}) {
+    this.options = options;
+    this.windows = {};         // Map of file paths to Window objects
+    this.files = [];           // List of open files
+    this.focused = null;       // Currently focused file
+  }
   
-  // Window tracking
-  add(file, opts = {})
-  remove(file)
-  focus(file)
+  open(file) {
+    if (!this.windows[file]) {
+      this.windows[file] = new Window(file, this.options);
+      this.files.push(file);
+    }
+    return this.windows[file];
+  }
   
-  // Access
-  files()
-  windows()
-  current()
+  close(file) {
+    if (this.windows[file]) {
+      this.files = this.files.filter(f => f !== file);
+      delete this.windows[file];
+      
+      if (this.focused === file && this.files.length > 0) {
+        this.focused = this.files[0];
+      } else if (this.files.length === 0) {
+        this.focused = null;
+      }
+    }
+  }
   
-  // State representation
-  view()
+  focus(file) {
+    if (this.windows[file]) {
+      this.focused = file;
+    } else {
+      // Optionally auto-open the file
+      this.open(file);
+      this.focused = file;
+    }
+  }
+  
+  current() {
+    return this.focused ? this.windows[this.focused] : null;
+  }
+  
+  format() {
+    // Format workspace state for display in system prompt
+    // Implementation details...
+  }
 }
 ```
 
 ### Window
 
-A Window represents a view into a specific file:
-
-- Tracks visible portion of a file
-- Maintains cursor position
-- Holds selection state
-- Handles scrolling and navigation
+A Window manages viewing and editing of a specific file:
 
 ```javascript
 class Window {
-  constructor(file, opts = {})
+  constructor(file, options = {}) {
+    this.file = file;
+    this.content = null;       // File content
+    this.visibleLines = {      // Visible portion of file
+      start: 0,
+      end: 20                  // Default: show first 20 lines
+    };
+    this.cursor = {            // Cursor position
+      line: 0,
+      char: 0
+    };
+    this.selection = null;     // Current selection, if any
+    
+    // Load file content
+    this.load();
+  }
   
-  // File access
-  path()
-  content()
+  async load() {
+    // Load file content from disk
+    // Implementation details...
+  }
   
-  // Visibility
-  span(start, end)
-  scroll(lines)
+  // Navigation methods
+  before(target) {
+    const position = this.find(target);
+    if (position) {
+      this.cursor = position;
+      this.selection = null;
+    }
+  }
   
-  // Cursor and selection
-  point(position)
-  mark(start, end)
-  clear()
+  after(target) {
+    const position = this.find(target);
+    if (position) {
+      // Adjust position to be after the target
+      this.cursor = {
+        line: position.line,
+        char: position.char + target.length
+      };
+      this.selection = null;
+    }
+  }
   
-  // Navigation
-  goto(target, mode = 'before')
+  // Selection methods
+  select(start, end) {
+    const startPos = this.find(start);
+    const endPos = this.find(end, startPos);
+    if (startPos && endPos) {
+      this.selection = {
+        start: startPos,
+        end: {
+          line: endPos.line,
+          char: endPos.char + end.length
+        }
+      };
+      this.cursor = startPos;
+    }
+  }
   
-  // Representation
-  text()
-  preview()
-  info()
+  drag(target, opts = {}) {
+    const startPos = this.cursor;
+    const endPos = this.find(target, startPos);
+    if (endPos) {
+      this.selection = {
+        start: startPos,
+        end: opts.inclusive ? 
+          { line: endPos.line, char: endPos.char + target.length } : 
+          endPos
+      };
+    }
+  }
+  
+  // Editing methods
+  replace(content) {
+    if (this.selection) {
+      // Replace selected text with new content
+      // Implementation details...
+    }
+  }
+  
+  insert(content) {
+    // Insert content at cursor position
+    // Implementation details...
+  }
+  
+  // View methods
+  scroll(lines) {
+    this.visibleLines.start = Math.max(0, this.visibleLines.start + lines);
+    this.visibleLines.end = this.visibleLines.start + 20; // Assuming 20-line window
+  }
+  
+  // Utility methods
+  find(target, startFrom = null) {
+    // Find position of target in content, starting from optional position
+    // Implementation details...
+  }
+  
+  hasSelection() {
+    return this.selection !== null;
+  }
+  
+  // Display methods
+  getVisibleContent() {
+    // Return visible portion of content
+    // Implementation details...
+  }
+  
+  getSelectionPreview() {
+    // Return a preview of selected text
+    // Implementation details...
+  }
+  
+  getCursorInfo() {
+    // Return information about cursor position
+    // Implementation details...
+  }
 }
 ```
 
-### Editor
+## Command Implementation Examples
 
-The Editor handles text manipulation operations:
+### `/open(file)`
 
-- Performs text replacements
-- Handles insertions at cursor positions
-- Processes text transformations
+Opens and focuses a file:
 
 ```javascript
-class Editor {
-  constructor(window)
-  
-  // Content operations
-  swap(selection, content)
-  inject(content)
-  place(position, content)
-  
-  // Text finding
-  find(text, opts = {})
-  seek(pattern, opts = {})
-  line(num)
-  range(start, end, opts = {})
+// In Interface
+open(file) {
+  this.workspace.open(file);
+  this.workspace.focus(file);
 }
-```
 
-## Command Implementation
-
-Each command from EXPERIENCE.md maps directly to a Commander method:
-
-### `/after() { target }`
-
-Positions the cursor after the specified target text.
-
-```javascript
-commander.after(target) 
-```
-
-### `/before() { target }`
-
-Positions the cursor before the specified target text.
-
-```javascript
-commander.before(target)
-```
-
-### `/close(file)`
-
-Closes the specified file.
-
-```javascript
-commander.close(file)
-```
-
-### `/drag(inclusive) { target }`
-
-Selects text from the current cursor position to the target.
-
-```javascript
-commander.drag(target, { inclusive })
+// Usage from Session
+session.run('open', 'example.js');
 ```
 
 ### `/edit() { content }`
 
-Replaces selection or inserts at cursor position.
+Edits current selection or inserts at cursor:
 
 ```javascript
-commander.edit(content)
+// In Interface
+edit(content) {
+  const window = this.workspace.current();
+  if (window.hasSelection()) {
+    window.replace(content); 
+  } else {
+    window.insert(content);
+  }
+}
+
+// Usage from Session
+session.run('edit', 'const x = 42;');
 ```
 
-### `/focus(file)`
+### `/after() { target }`
 
-Focuses the specified file.
-
-```javascript
-commander.focus(file)
-```
-
-### `/open(file)`
-
-Opens and focuses the specified file.
+Positions cursor after target text:
 
 ```javascript
-commander.open(file)
-```
+// In Interface
+after(target) {
+  this.workspace.current().after(target);
+}
 
-### `/scroll(lines)`
-
-Scrolls the focused window.
-
-```javascript
-commander.scroll(lines)
+// Usage from Session
+session.run('after', 'function');
 ```
 
 ### `/select(start, end)`
 
-Creates a selection from start to end.
+Creates selection between two points:
 
 ```javascript
-commander.select(start, end)
+// In Interface
+select(start, end) {
+  this.workspace.current().select(start, end);
+}
+
+// Usage from Session
+session.run('select', { start: 'function', end: '}' });
 ```
 
 ## System Prompt Representation
 
-The workspace state is represented in the system prompt with a format like:
+The workspace state is represented in the system prompt:
 
 ```
 WORKSPACE:
@@ -297,6 +420,9 @@ const session = planchette({
 await session.run('open', 'example.js');
 await session.run('before', 'function');
 await session.run('edit', '// Add a comment\n');
+
+// Get system prompt representation
+const prompt = session.prompt();
 ```
 
 ## File Structure
@@ -305,10 +431,9 @@ await session.run('edit', '// Add a comment\n');
 planchette/
 ├── planchette.js       # Main entry point
 ├── session.js          # Session implementation
-├── commander.js        # Command interface implementation
+├── interface.js        # Command interface implementation
 ├── workspace.js        # Workspace implementation
 ├── window.js           # Window implementation
-├── editor.js           # Text editing operations
 └── utils/
     ├── display.js      # Format text for display
     └── file.js         # File system utilities
