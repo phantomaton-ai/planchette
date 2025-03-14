@@ -8,12 +8,19 @@ The LLM sees the current state of its workspace in its system prompt, including:
 
 ## Window
 
-TODO What does a window look like?
+A window looks like:
+
++===================== file.js =======================+
+import foo from './foo.js';
+
++=====================================================+
 
 Additionally, text under each window:
 
 * Shows line numbering of the current window
   * e.g. "Showing lines 1 through 100 of 1024 (1-based)"
+* Shows horizontal scroll position
+  * e.g. "Showing characters 1 through 60 of each line (1-based)"
 
 And, under the focused window, text:
 
@@ -22,6 +29,8 @@ And, under the focused window, text:
   * "Cursor at line 6, character 3, just before: Examp..."
 
 # Commands
+
+An LLM should have the following commands available to it to support text editing:
 
 ## `/after() { target }`
 
