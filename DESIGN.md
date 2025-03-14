@@ -25,12 +25,12 @@ Planchette follows a modular architecture with the following key components:
         │
         ▼
 ┌────────────────┐     ┌────────────────┐
-│   Workspace    │◄────┤     Window     │  Tracks open files and their views
+│   Commander    │◄────┤   Workspace    │  Command interface for LLM operations
 └───────┬────────┘     └────────────────┘
         │
         ▼
 ┌────────────────┐     ┌────────────────┐
-│     Editor     │◄────┤    Selector    │  Handles text editing and selection
+│     Window     │◄────┤    Editor      │  File views and text operations
 └────────────────┘     └────────────────┘
 ```
 
@@ -38,61 +38,83 @@ Planchette follows a modular architecture with the following key components:
 
 The Session manages the LLM's current working system environment, similar to a shell session:
 
-- Tracks the current workspace state
-- Provides methods for file operations
-- Executes system commands
-- Maintains focus and selection state
+- Maintains a workspace state
+- Holds a reference to the commander
+- Serves as the primary external API
 
 ```javascript
 class Session {
   constructor(options = {})
   
-  // File operations
-  async open(file)
-  close(file)
-  async read(file, options = {})
-  async edit(file, content, options = {})
-  async remove(file)
+  // Public API - delegates to Commander
+  async run(command, body)
   
-  // Navigation and selection
+  // Configuration
+  config(options)
+  
+  // System prompt generation
+  prompt()
+}
+```
+
+### Commander
+
+The Commander implements all command handlers and provides the interface for LLM operations:
+
+- Exposes all command methods directly supporting the LLM interface
+- Translates high-level commands to file operations
+- Manages cursor and selection state through window objects
+
+```javascript
+class Commander {
+  constructor(workspace, options = {})
+  
+  // File commands
+  open(file)
+  close(file)
+  read(file, opts = {})
+  edit(content, opts = {})
+  remove(file)
+  
+  // Navigation commands
   focus(file)
   before(target)
   after(target)
-  select(start, end, options = {})
-  drag(target, options = {})
+  select(start, end, opts = {})
+  drag(target, opts = {})
   
-  // Window management
+  // View commands
   scroll(lines)
   
-  // System operations
-  async execute(command, input = null)
+  // System commands
+  exec(command, input = null)
 }
 ```
 
 ### Workspace
 
-The Workspace manages open files and their display properties:
+The Workspace manages open files and their display state:
 
-- Tracks open files
-- Maintains focused file state
-- Supports windowed views of files
-- Handles cursor and selection state
+- Tracks open files and windows
+- Maintains focused window state
+- Provides window access to the Commander
 
 ```javascript
 class Workspace {
   constructor(options = {})
   
-  // Window management
-  open(file, options = {})
-  close(file)
+  // Window tracking
+  add(file, opts = {})
+  remove(file)
   focus(file)
   
-  // View properties
-  getWindows()
-  getFocusedWindow()
+  // Access
+  files()
+  windows()
+  current()
   
   // State representation
-  getSystemPromptRepresentation()
+  view()
 }
 ```
 
@@ -107,24 +129,28 @@ A Window represents a view into a specific file:
 
 ```javascript
 class Window {
-  constructor(file, options = {})
+  constructor(file, opts = {})
+  
+  // File access
+  path()
+  content()
   
   // Visibility
-  setVisibleLines(start, end)
+  span(start, end)
   scroll(lines)
   
   // Cursor and selection
-  setCursor(position)
-  setSelection(start, end)
-  clearSelection()
+  point(position)
+  mark(start, end)
+  clear()
   
   // Navigation
-  moveCursorTo(target, mode = 'before')
+  goto(target, mode = 'before')
   
-  // Content representation
-  getVisibleContent()
-  getSelectionPreview()
-  getCursorInfo()
+  // Representation
+  text()
+  preview()
+  info()
 }
 ```
 
@@ -134,67 +160,43 @@ The Editor handles text manipulation operations:
 
 - Performs text replacements
 - Handles insertions at cursor positions
-- Manages selection replacements
-- Works with the Window's selection state
+- Processes text transformations
 
 ```javascript
 class Editor {
   constructor(window)
   
-  // Editing operations
-  async replace(selection, content)
-  async insertAtCursor(content)
-  async insertAtPosition(position, content)
+  // Content operations
+  swap(selection, content)
+  inject(content)
+  place(position, content)
   
-  // Selection operations
-  async selectBetween(start, end, options = {})
-  async selectFrom(start, options = {})
-  async dragToTarget(target, options = {})
-}
-```
-
-### Selector
-
-The Selector interprets different ways of specifying text positions:
-
-- Resolves line/character positions
-- Finds text matches
-- Handles regex patterns
-- Supports landmark-based positioning
-
-```javascript
-class Selector {
-  constructor(content)
-  
-  // Position resolution
-  findPosition(target, mode = 'before')
-  findRange(start, end, options = {})
-  
-  // Target types
-  findText(text, options = {})
-  findRegex(pattern, options = {})
-  findLine(lineNumber)
+  // Text finding
+  find(text, opts = {})
+  seek(pattern, opts = {})
+  line(num)
+  range(start, end, opts = {})
 }
 ```
 
 ## Command Implementation
 
-Each command from EXPERIENCE.md is implemented as follows:
+Each command from EXPERIENCE.md maps directly to a Commander method:
 
 ### `/after() { target }`
 
-Sets the cursor position after the specified target text in the focused window.
+Positions the cursor after the specified target text.
 
 ```javascript
-session.after(target) 
+commander.after(target) 
 ```
 
 ### `/before() { target }`
 
-Sets the cursor position before the specified target text in the focused window.
+Positions the cursor before the specified target text.
 
 ```javascript
-session.before(target)
+commander.before(target)
 ```
 
 ### `/close(file)`
@@ -202,7 +204,7 @@ session.before(target)
 Closes the specified file.
 
 ```javascript
-session.close(file)
+commander.close(file)
 ```
 
 ### `/drag(inclusive) { target }`
@@ -210,15 +212,15 @@ session.close(file)
 Selects text from the current cursor position to the target.
 
 ```javascript
-session.drag(target, { inclusive })
+commander.drag(target, { inclusive })
 ```
 
 ### `/edit() { content }`
 
-Replaces the current selection with the provided content, or inserts at the cursor position if no selection exists.
+Replaces selection or inserts at cursor position.
 
 ```javascript
-session.edit(focusedFile, content)
+commander.edit(content)
 ```
 
 ### `/focus(file)`
@@ -226,7 +228,7 @@ session.edit(focusedFile, content)
 Focuses the specified file.
 
 ```javascript
-session.focus(file)
+commander.focus(file)
 ```
 
 ### `/open(file)`
@@ -234,7 +236,7 @@ session.focus(file)
 Opens and focuses the specified file.
 
 ```javascript
-session.open(file)
+commander.open(file)
 ```
 
 ### `/scroll(lines)`
@@ -242,15 +244,15 @@ session.open(file)
 Scrolls the focused window.
 
 ```javascript
-session.scroll(lines)
+commander.scroll(lines)
 ```
 
 ### `/select(start, end)`
 
-Creates a selection from start to end in the focused window.
+Creates a selection from start to end.
 
 ```javascript
-session.select(start, end)
+commander.select(start, end)
 ```
 
 ## System Prompt Representation
@@ -268,15 +270,15 @@ function example() {
   // Contents here
 }
 +=====================================================+
-Showing lines 1 through 5 of 120 (1-based)
-Cursor at line 3, character 1, just before: function...
+Lines 1-5 of 120
+Cursor at line 3, char 1, before: function...
 
 +===================== utils.js ======================+
 export function helper() {
   return 'helper';
 }
 +=====================================================+
-Showing lines 1 through 3 of 45 (1-based)
+Lines 1-3 of 45
 ```
 
 ## Main Exports and API
@@ -288,13 +290,13 @@ import planchette from 'planchette';
 
 // Create a new session
 const session = planchette({
-  rootDir: '/path/to/project'
+  root: '/path/to/project'
 });
 
 // Use the session
-await session.open('example.js');
-session.before('function');
-session.edit('example.js', '// Add a comment\n');
+await session.run('open', 'example.js');
+await session.run('before', 'function');
+await session.run('edit', '// Add a comment\n');
 ```
 
 ## File Structure
@@ -303,10 +305,10 @@ session.edit('example.js', '// Add a comment\n');
 planchette/
 ├── planchette.js       # Main entry point
 ├── session.js          # Session implementation
+├── commander.js        # Command interface implementation
 ├── workspace.js        # Workspace implementation
 ├── window.js           # Window implementation
 ├── editor.js           # Text editing operations
-├── selector.js         # Selection utilities
 └── utils/
     ├── display.js      # Format text for display
     └── file.js         # File system utilities
@@ -314,8 +316,8 @@ planchette/
 
 ## Future Extensions
 
-1. **Integration with LLM Frameworks**: Direct integration with LLM providers
-2. **Project Templates**: Quick-start project scaffolding
-3. **Language-Specific Enhancements**: Syntax-aware editing for programming languages
-4. **Multi-File Operations**: Coordinated changes across multiple files
-5. **Version Control Integration**: Git operations and diff visualization
+1. **LLM Integration**: Direct integration with LLM frameworks
+2. **Templates**: Project scaffolding capabilities
+3. **Syntax Support**: Language-aware editing features
+4. **Multi-File**: Coordinated changes across files
+5. **Git Operations**: Version control integration
