@@ -95,7 +95,7 @@ export default class Session {
   async execute(command, input = null) {
     try {
       const { stdout, stderr } = await asyncExec(command, {
-        cwd: this.rootDir
+        cwd: this.root
       });
       return { stdout, stderr };
     } catch (error) {
