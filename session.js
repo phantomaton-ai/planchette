@@ -16,7 +16,7 @@ export default class Session {
    * @param {Object} [options] - Session configuration
    */
   constructor(options = {}) {
-    this.rootDir = options.rootDir || process.cwd();
+    this.root = options.root || process.cwd();
     this.workspace = new Workspace();
   }
 
@@ -26,7 +26,7 @@ export default class Session {
    * @param {object|string|RegExp} [window] - Context window definition
    */
   async open(file, window = null) {
-    const fullPath = path.resolve(this.rootDir, file);
+    const fullPath = path.resolve(this.root, file);
     await fs.access(fullPath); // Verify file exists
     this.workspace.open(fullPath, window);
   }
@@ -36,7 +36,7 @@ export default class Session {
    * @param {string} file - Path to the file
    */
   close(file) {
-    const fullPath = path.resolve(this.rootDir, file);
+    const fullPath = path.resolve(this.root, file);
     this.workspace.close(fullPath);
   }
 
@@ -47,7 +47,7 @@ export default class Session {
    * @returns {Promise<string>} File contents
    */
   async read(file, window = null) {
-    const fullPath = path.resolve(this.rootDir, file);
+    const fullPath = path.resolve(this.root, file);
     const content = await fs.readFile(fullPath, 'utf-8');
     
     // TODO: Implement sophisticated windowing logic
@@ -74,7 +74,7 @@ export default class Session {
    * @param {object|string|RegExp} [window] - Context window definition
    */
   async edit(file, content, window = null) {
-    const fullPath = path.resolve(this.rootDir, file);
+    const fullPath = path.resolve(this.root, file);
     
     if (window) {
       // TODO: Implement windowed editing
@@ -111,7 +111,7 @@ export default class Session {
    * @param {string} file - Path to the file
    */
   async remove(file) {
-    // const fullPath = path.resolve(this.rootDir, file);
+    // const fullPath = path.resolve(this.root, file);
     // await fs.unlink(fullPath);
     // this.close(file);
   }
