@@ -125,12 +125,6 @@ class Interface {
   scroll(lines) {
     this.workspace.current().scroll(lines);
   }
-  
-  // System commands
-  async exec(command) {
-    // Execute system command
-    // Implementation details...
-  }
 }
 ```
 
