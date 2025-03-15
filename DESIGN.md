@@ -53,17 +53,17 @@ The Session owns the Interface and Workspace, serving as the primary external AP
 class Session {
   constructor(options = {}) {
     this.workspace = new Workspace(options);
-    this.interface = new Interface(this.workspace);
+    this.api = new Api(this.workspace);
   }
   
-  // Primary API method
-  async run(command, body) {
-    return await this.interface[command](body);
+  // List all commands currently available in this session
+  commands() {
+    return commands(this.api);
   }
   
   // System prompt generation
-  prompt() {
-    return this.workspace.format();
+  display() {
+    return this.workspace.display();
   }
 }
 ```
