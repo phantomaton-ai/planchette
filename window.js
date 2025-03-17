@@ -1,6 +1,6 @@
 const validate = (index) => {
   if (index < 0) {
-    throw new Exception('Unknown target');
+    throw new Error('Unknown target');
   }
 };
 
@@ -18,11 +18,11 @@ export default class Window {
   }
 
   before(target) {
-    this.state.cursor = this.index(target);
+    this.state.cursor = this.find(target);
   }
   
   after(target) {
-    this.state.cursor = this.index(target) + target.length;
+    this.state.cursor = this.find(target) + target.length;
   }
 
   cursor() {
@@ -30,17 +30,17 @@ export default class Window {
   }
   
   select(start, end) {
-    this.state.cursor = this.position(this.index(start));
-    this.state.end = this.position(this.index(end));
+    this.state.cursor = this.find(start);
+    this.state.end = this.find(end);
   }
   
   drag(target) {
-    this.state.cursor = this.index(target) + target.length;
+    this.state.cursor = this.find(target) + target.length;
   }
   
   async edit(content) {
-    const before = this.content.slice(0, this.cursor);
-    const after = this.content.slice(this.end);
+    const before = this.content.slice(0, this.state.cursor);
+    const after = this.content.slice(this.state.end);
     this.content = `${before}${content}${after}`;
     await this.file.write(content);
   }
@@ -50,7 +50,7 @@ export default class Window {
   }
 
   selection() {
-    return this.selecting() ? content.slice(this.state.cursor, this.state.end - this.state.cursor) : '';
+    return this.selecting() ? this.content.slice(this.state.cursor, this.state.end) : '';
   }
 
   selected() {
