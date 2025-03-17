@@ -13,6 +13,6 @@ export default class File {
   }
 
   write(content) {
-    return this.adapter.write(this.path, this.content);
+    return this.adapter.write(this.path, content);
   }
 };
