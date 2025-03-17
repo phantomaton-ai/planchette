@@ -1,9 +1,3 @@
-const validate = (index) => {
-  if (index < 0) {
-    throw new Error('Unknown target');
-  }
-};
-
 export default class Window {
   constructor(file, content, options = {}) {
     this.file = file;
@@ -67,11 +61,6 @@ export default class Window {
   }
 
   find(target, skip = 0) {
-    // Handle non-string targets
-    if (typeof target !== 'string') {
-      throw new Error(`Cannot find ${target}`);
-    }
-    
     const index = this.content.indexOf(target, skip);
     if (index < 0) {
       throw new Error(`Cannot find ${target}`);
