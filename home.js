@@ -4,6 +4,7 @@ import Adapter from './adapter.js';
 
 export default class Home extends Adapter {
   constructor(root, adapter) {
+    super();
     this.root = root;
     this.adapter = adapter;
   }

@@ -1,5 +1,6 @@
 import Adapter from './adapter.js';
 import Display from './display.js';
+import Home from './home.js';
 
 export default class Workspace {
   constructor({ adapter, home, size }) {

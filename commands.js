@@ -1,6 +1,6 @@
 const commands = workspace => [
   {
-    name: open,
+    name: 'open',
     description: 'Open the specified file in the current workspace',
     example: {
       description: 'Open the file test.txt in the home directory',
