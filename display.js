@@ -43,5 +43,7 @@ export default class Display {
       rendered += '## Hidden\n\n';
       rendered += `${skipped} windows hidden for space.`;
     }
+
+    return rendered;
   }
 }

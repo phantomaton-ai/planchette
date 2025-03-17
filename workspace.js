@@ -1,6 +1,8 @@
 import Adapter from './adapter.js';
 import Display from './display.js';
+import File from './file.js';
 import Home from './home.js';
+import Window from './window.js';
 
 export default class Workspace {
   constructor({ adapter, home, size }) {
@@ -14,8 +16,8 @@ export default class Workspace {
     return this.windows[0];
   }
 
-  open(path) {
-    const win = this.find(path) || new Window(this.file(path));
+  async open(path) {
+    const win = this.find(path) || await this.window(path);
     this.windows = [win, ...(this.windows.filter(w => win !== w))];
   }
   
@@ -35,6 +37,12 @@ export default class Workspace {
 
   file(path) {
     return new File(path, this.adapter);
+  }
+
+  async window(path) {
+    const file = this.file(path);
+    const content = await file.read();
+    return new Window(file, content);
   }
 
   find(path) {

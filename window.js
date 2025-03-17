@@ -1,13 +1,13 @@
-const validate(index) {
+const validate = (index) => {
   if (index < 0) {
     throw new Exception('Unknown target');
   }
-}
+};
 
 export default class Window {
-  constructor(file, options = {}) {
+  constructor(file, content, options = {}) {
     this.file = file;
-    this.content = content; // TODO: read
+    this.content = content;
     this.scroll = options.scroll || 0;
     this.lines = content.split('\n');
     this.size = options.size || 100;
@@ -32,11 +32,11 @@ export default class Window {
     this.cursor = this.index(target) + target.length;
   }
   
-  edit(content) {
+  async edit(content) {
     const before = this.content.slice(0, this.cursor);
     const after = this.content.slice(this.end);
     this.content = `${before}${content}${after}`;
-    // TODO save?
+    await this.file.write(content);
   }
   
   scroll(lines) {
