@@ -1,4 +1,4 @@
-class Interface {
+export default class Facade {
   constructor(workspace) {
     this.workspace = workspace;
   }
@@ -43,4 +43,4 @@ class Interface {
   scroll(lines) {
     this.workspace.current().scroll(lines);
   }
-}
+};
