@@ -21,16 +21,16 @@ describe('Window', () => {
     it('initializes with correct properties', () => {
       expect(window.file).to.equal(file);
       expect(window.content).to.equal(testContent);
-      expect(window.scroll).to.equal(0);
+      expect(window.state.scroll).to.equal(0);
       expect(window.size).to.equal(3);
-      expect(window.cursor).to.equal(0);
-      expect(window.end).to.equal(0);
+      expect(window.state.cursor).to.equal(0);
+      expect(window.state.end).to.equal(0);
       expect(window.lines).to.deep.equal(['line1', 'line2', 'line3', 'line4', 'line5']);
     });
     
     it('uses default options when not provided', () => {
       const defaultWindow = new Window(file, testContent);
-      expect(defaultWindow.scroll).to.equal(0);
+      expect(defaultWindow.state.scroll).to.equal(0);
       expect(defaultWindow.size).to.equal(100);
     });
   });
@@ -38,7 +38,7 @@ describe('Window', () => {
   describe('before', () => {
     it('sets cursor to the index of the target', () => {
       window.before('line2');
-      expect(window.cursor).to.equal(testContent.indexOf('line2'));
+      expect(window.state.cursor).to.equal(testContent.indexOf('line2'));
     });
     
     it('throws error if target not found', () => {
@@ -50,7 +50,14 @@ describe('Window', () => {
     it('sets cursor to the index after the target', () => {
       window.after('line2');
       const targetIndex = testContent.indexOf('line2');
-      expect(window.cursor).to.equal(targetIndex + 'line2'.length);
+      expect(window.state.cursor).to.equal(targetIndex + 'line2'.length);
+    });
+  });
+
+  describe('cursor', () => {
+    it('returns the current cursor position', () => {
+      window.state.cursor = 10;
+      expect(window.cursor()).to.equal(10);
     });
   });
 
@@ -60,25 +67,25 @@ describe('Window', () => {
       const startIndex = testContent.indexOf('line2');
       const endIndex = testContent.indexOf('line3');
       
-      expect(window.cursor).to.equal(startIndex);
-      expect(window.end).to.equal(endIndex);
+      expect(window.state.cursor).to.equal(startIndex);
+      expect(window.state.end).to.equal(endIndex);
     });
   });
 
   describe('drag', () => {
     it('sets cursor to index after target', () => {
-      window.cursor = 5; // Set initial cursor position
+      window.state.cursor = 5; // Set initial cursor position
       window.drag('line3');
       const targetIndex = testContent.indexOf('line3');
       
-      expect(window.cursor).to.equal(targetIndex + 'line3'.length);
+      expect(window.state.cursor).to.equal(targetIndex + 'line3'.length);
     });
   });
 
   describe('edit', () => {
     it('replaces content between cursor and end', async () => {
-      window.cursor = 6; // Start of line2
-      window.end = 17;   // Start of line4
+      window.state.cursor = 6; // Start of line2
+      window.state.end = 17;   // Start of line4
       const newContent = 'replaced content';
       
       await window.edit(newContent);
@@ -90,8 +97,8 @@ describe('Window', () => {
     });
     
     it('inserts at cursor when not selecting', async () => {
-      window.cursor = 6; // Start of line2
-      window.end = 6;    // Same position (no selection)
+      window.state.cursor = 6; // Start of line2
+      window.state.end = 6;    // Same position (no selection)
       const newContent = 'inserted ';
       
       await window.edit(newContent);
@@ -104,48 +111,61 @@ describe('Window', () => {
   describe('scroll', () => {
     it('scrolls down by specified lines', () => {
       window.scroll(2);
-      expect(window.scroll).to.equal(2);
+      expect(window.state.scroll).to.equal(2);
     });
     
     it('does not scroll below 0', () => {
       window.scroll(-5);
-      expect(window.scroll).to.equal(0);
+      expect(window.state.scroll).to.equal(0);
     });
     
     it('does not scroll beyond line count', () => {
       window.scroll(10);
-      expect(window.scroll).to.equal(5); // 5 lines total
+      expect(window.state.scroll).to.equal(5); // 5 lines total
     });
   });
 
   describe('selecting', () => {
     it('returns true when end > cursor', () => {
-      window.cursor = 5;
-      window.end = 10;
+      window.state.cursor = 5;
+      window.state.end = 10;
       expect(window.selecting()).to.be.true;
     });
     
     it('returns false when end === cursor', () => {
-      window.cursor = 5;
-      window.end = 5;
+      window.state.cursor = 5;
+      window.state.end = 5;
       expect(window.selecting()).to.be.false;
     });
   });
 
-  describe('selected', () => {
+  describe('selection', () => {
     it('returns selected text when selecting', () => {
       // Modifying window.content so we can control the exact substring behavior
       window.content = 'abcdefghij';
-      window.cursor = 2; // 'c'
-      window.end = 7;    // 'h'
+      window.state.cursor = 2; // 'c'
+      window.state.end = 7;    // 'h'
       
-      expect(window.selected()).to.equal('cdefg');
+      expect(window.selection()).to.equal('cdefg');
     });
     
     it('returns empty string when not selecting', () => {
-      window.cursor = 5;
-      window.end = 5;
-      expect(window.selected()).to.equal('');
+      window.state.cursor = 5;
+      window.state.end = 5;
+      expect(window.selection()).to.equal('');
+    });
+  });
+
+  describe('selected', () => {
+    it('returns selected range', () => {
+      window.state.cursor = 5;
+      window.state.end = 10;
+      
+      const selection = window.selected();
+      expect(selection).to.deep.equal({
+        start: 5,
+        end: 10
+      });
     });
   });
 
@@ -162,7 +182,7 @@ describe('Window', () => {
 
   describe('view', () => {
     it('returns visible lines based on scroll and size', () => {
-      window.scroll = 1; // Start at line2
+      window.state.scroll = 1; // Start at line2
       window.size = 2;   // Show 2 lines
       
       expect(window.view()).to.equal('line2\nline3');
@@ -176,20 +196,20 @@ describe('Window', () => {
     });
     
     it('returns true when scrolled down', () => {
-      window.scroll = 1;
+      window.state.scroll = 1;
       expect(window.scrolling()).to.be.true;
     });
     
     it('returns false when all content visible', () => {
       window.size = 10; // More than lines available
-      window.scroll = 0;
+      window.state.scroll = 0;
       expect(window.scrolling()).to.be.false;
     });
   });
 
   describe('scrolled', () => {
     it('returns correct scroll information', () => {
-      window.scroll = 1;
+      window.state.scroll = 1;
       window.size = 2;
       
       const info = window.scrolled();
