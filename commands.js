@@ -10,3 +10,5 @@ const commands = workspace => [
     validate: ({ file }) => typeof file === 'string',
   }
 ];
+
+export default commands;
