@@ -19,6 +19,7 @@
   "description": "",
   "type": "module",
   "devDependencies": {
-    "lovecraft": "^1.0.3"
+    "lovecraft": "^1.0.3",
+    "phantomaton": "^0.0.7"
   }
 }
