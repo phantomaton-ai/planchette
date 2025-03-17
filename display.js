@@ -1,23 +1,21 @@
-const status = win => {
-  let info = '';
-  
-  // Add scroll information
+const quote = str => '`' + str + '`';
+
+const scrollInfo = win => {
   const view = win.scrolled();
-  info += win.scrolling() 
-    ? `Lines ${view.start}-${view.end} of ${view.total}\n`
-    : `Full content shown\n`;
+  return win.scrolling() 
+    ? `Lines ${view.start}-${view.end} of ${view.total}`
+    : `Full content shown`;
+};
 
-  // Add cursor/selection information
+const cursorInfo = win => {
   if (!win.selecting()) {
-    info += `Cursor at position ${win.cursor}`;    
+    return `Cursor at position ${win.cursor}`;    
   } else {
-    info += `Selecting text from ${win.cursor} to ${win.end}:\n\n`;
-    info += '```\n';
-    info += `${win.selected()}`;
-    info += '```\n';
+    return `Selecting text from ${win.cursor} to ${win.end}:\n\n` +
+           '```\n' +
+           `${win.selected()}` +
+           '```\n';
   }
-
-  return info;
 };
 
 export default class Display {
@@ -35,12 +33,20 @@ export default class Display {
     let hidden = 0;
 
     windows.forEach((win, i) => {
-      const file = '`' + win.file.path + '`';
+      const file = quote(win.file.path);
       const head = i === 0 ? 
         `## Focused: ${file}\n` :
         `## Window ${i}: ${file}\n`;
       const body = ['```', win.view(), '```'].join('\n');
-      const info = i === 0 ? status(win) : status(win).split('\n')[0]; // Just scroll info for background windows
+      
+      // Always show scroll info
+      const scroll = scrollInfo(win);
+      
+      // Only show cursor info for focused window
+      const info = i === 0 ? 
+        [scroll, cursorInfo(win)].join('\n\n') : 
+        scroll;
+      
       const block = [head, body, info].join('\n\n');
       
       if (block.length + text.length < this.size) {
