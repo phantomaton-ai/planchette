@@ -63,16 +63,15 @@ export default class Window {
     return this.lines.slice(this.scroll, this.scroll + this.size).join('\n');
   }
   
-  scrollInfo() {
-    const visibleStart = this.scroll + 1; // 1-based line numbers for display
-    const visibleEnd = Math.min(this.scroll + this.size, this.lines.length);
-    const totalLines = this.lines.length;
-    
+  scrolling() {
+    return this.lines.length > this.size || this.scroll > 0;
+  }
+  
+  scrolled() {
     return {
-      visibleStart,
-      visibleEnd,
-      totalLines,
-      isComplete: visibleEnd === totalLines && visibleStart === 1
+      start: this.scroll + 1, // 1-based line numbers for display
+      end: Math.min(this.scroll + this.size, this.lines.length),
+      total: this.lines.length
     };
   }
 }
