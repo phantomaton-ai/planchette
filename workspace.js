@@ -2,10 +2,10 @@ import Adapter from './adapter.js';
 import Display from './display.js';
 
 export default class Workspace {
-  constructor({ adapter, display, home }) {
+  constructor({ adapter, home, size }) {
     this.home = home || process.cwd();
     this.adapter = new Home(this.home, adapter || new Adapter());
-    this.display = new Display(display);
+    this.display = new Display({ size });
     this.windows = [];
   }
 
