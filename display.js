@@ -29,6 +29,11 @@ export default class Display {
 
   render(windows) {
     let text = '# Workspace\n\n';
+    
+    if (!windows.length) {
+      return text + 'The Workspace is empty, no Windows are open.';
+    }
+    
     let hidden = 0;
 
     windows.forEach((win, i) => {
