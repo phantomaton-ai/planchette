@@ -23,12 +23,16 @@ export default class Workspace {
   
   close(path) {
     const win = this.find(path);
-    this.windows = this.windows.filter(w => win !== w);
+    if (win) {
+      this.windows = this.windows.filter(w => win !== w);
+    }
   }
 
   focus(path) {
     const win = this.find(path);
-    this.windows = [win, ...(this.windows.filter(w => win !== w))];
+    if (win) {
+      this.windows = [win, ...(this.windows.filter(w => win !== w))];
+    }
   }
 
   view() {
