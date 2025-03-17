@@ -73,6 +73,7 @@ describe('Commands', () => {
     it('validates file parameter', () => {
       expect(closeCmd.validate({ file: 'test.txt' })).to.be.true;
       expect(closeCmd.validate({ file: 123 })).to.be.false;
+      expect(closeCmd.validate({})).to.be.false;
     });
     
     it('calls workspace.close with file parameter', () => {
@@ -89,6 +90,16 @@ describe('Commands', () => {
       focusCmd = cmds.find(cmd => cmd.name === 'focus');
     });
     
+    it('has the correct properties', () => {
+      expect(focusCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates file parameter', () => {
+      expect(focusCmd.validate({ file: 'test.txt' })).to.be.true;
+      expect(focusCmd.validate({ file: 123 })).to.be.false;
+      expect(focusCmd.validate({})).to.be.false;
+    });
+    
     it('calls workspace.focus with file parameter', () => {
       focusCmd.perform({ file: 'test.txt' });
       expect(workspace.focus.calledOnce).to.be.true;
@@ -101,6 +112,16 @@ describe('Commands', () => {
     
     beforeEach(() => {
       beforeCmd = cmds.find(cmd => cmd.name === 'before');
+    });
+    
+    it('has the correct properties', () => {
+      expect(beforeCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates target parameter', () => {
+      expect(beforeCmd.validate({ target: 'function' })).to.be.true;
+      expect(beforeCmd.validate({ target: 123 })).to.be.false;
+      expect(beforeCmd.validate({})).to.be.false;
     });
     
     it('calls window.before with target parameter', () => {
@@ -118,6 +139,16 @@ describe('Commands', () => {
       afterCmd = cmds.find(cmd => cmd.name === 'after');
     });
     
+    it('has the correct properties', () => {
+      expect(afterCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates target parameter', () => {
+      expect(afterCmd.validate({ target: 'import' })).to.be.true;
+      expect(afterCmd.validate({ target: 123 })).to.be.false;
+      expect(afterCmd.validate({})).to.be.false;
+    });
+    
     it('calls window.after with target parameter', () => {
       afterCmd.perform({ target: 'import' });
       expect(window.after.calledOnce).to.be.true;
@@ -130,6 +161,19 @@ describe('Commands', () => {
     
     beforeEach(() => {
       selectCmd = cmds.find(cmd => cmd.name === 'select');
+    });
+    
+    it('has the correct properties', () => {
+      expect(selectCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates start and end parameters', () => {
+      expect(selectCmd.validate({ start: 'function', end: '}' })).to.be.true;
+      expect(selectCmd.validate({ start: 'function', end: 123 })).to.be.false;
+      expect(selectCmd.validate({ start: 123, end: '}' })).to.be.false;
+      expect(selectCmd.validate({ start: 'function' })).to.be.false;
+      expect(selectCmd.validate({ end: '}' })).to.be.false;
+      expect(selectCmd.validate({})).to.be.false;
     });
     
     it('calls window.select with start and end parameters', () => {
@@ -147,6 +191,16 @@ describe('Commands', () => {
       dragCmd = cmds.find(cmd => cmd.name === 'drag');
     });
     
+    it('has the correct properties', () => {
+      expect(dragCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates target parameter', () => {
+      expect(dragCmd.validate({ target: ';' })).to.be.true;
+      expect(dragCmd.validate({ target: 123 })).to.be.false;
+      expect(dragCmd.validate({})).to.be.false;
+    });
+    
     it('calls window.drag with target parameter', () => {
       dragCmd.perform({ target: ';' });
       expect(window.drag.calledOnce).to.be.true;
@@ -159,6 +213,16 @@ describe('Commands', () => {
     
     beforeEach(() => {
       editCmd = cmds.find(cmd => cmd.name === 'edit');
+    });
+    
+    it('has the correct properties', () => {
+      expect(editCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates content parameter', () => {
+      expect(editCmd.validate({ content: 'const x = 42;' })).to.be.true;
+      expect(editCmd.validate({ content: 123 })).to.be.false;
+      expect(editCmd.validate({})).to.be.false;
     });
     
     it('calls window.edit with content parameter', () => {
@@ -174,6 +238,17 @@ describe('Commands', () => {
     
     beforeEach(() => {
       scrollCmd = cmds.find(cmd => cmd.name === 'scroll');
+    });
+    
+    it('has the correct properties', () => {
+      expect(scrollCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+    });
+    
+    it('validates lines parameter', () => {
+      expect(scrollCmd.validate({ lines: 10 })).to.be.true;
+      expect(scrollCmd.validate({ lines: -5 })).to.be.true; // Negative numbers are valid
+      expect(scrollCmd.validate({ lines: '10' })).to.be.false;
+      expect(scrollCmd.validate({})).to.be.false;
     });
     
     it('calls window.scroll with lines parameter', () => {
