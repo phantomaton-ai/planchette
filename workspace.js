@@ -29,7 +29,7 @@ export default class Workspace {
     this.windows = [win, ...(this.windows.filter(w => win !== w))];
   }
 
-  display() {
+  view() {
     return this.display.render(this.windows);
   }
 
