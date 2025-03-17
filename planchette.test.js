@@ -8,7 +8,7 @@ import planchette from './planchette.js';
 describe('Planchette', () => {
   const tmp = os.tmpdir();
 
-  it('should start a session', () => {
+  it('starts a session', () => {
     const session = planchette({ root: tmp });
     expect(session).instanceof(Session);
     expect(session.root).to.equal(tmp);
