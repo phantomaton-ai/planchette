@@ -1,6 +1,7 @@
 export default class Workspace {
-  constructor(session) {
-    this.session = session;
+  constructor({ adapter, display }) {
+    this.adapter = adapter;
+    this.display = new Display(display);
     this.windows = [];
   }
 
@@ -8,12 +9,12 @@ export default class Workspace {
     return this.windows[0];
   }
 
-  open(file) {
+  open(path) {
     const win = this.find(file) || new Window(file);
     this.windows = [win, ...this.windows.filter(w => win !== w)];
   }
   
-  close(file) {
+  close(path) {
     const win = this.find(file);
     this.windows = this.windows.filter(w => win !== w)];
   }
@@ -24,10 +25,10 @@ export default class Workspace {
   }
 
   display() {
-    // TODO: render
+    return this.display.render(this.windows);
   }
 
-  find(file) {
-    return this.windows.find(w => w.file === file);
+  find(path) {
+    return this.windows.find(w => w.file.path === path);
   }
 }
