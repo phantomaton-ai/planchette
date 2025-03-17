@@ -13,7 +13,16 @@ const summarize = win => {
   }
 
   return summary;
-}
+};
+
+const scrollStatus = win => {
+  if (!win.scrolling()) {
+    return 'Full content shown';
+  }
+  
+  const scroll = win.scrolled();
+  return `Showing lines ${scroll.start}-${scroll.end} of ${scroll.total}`;
+};
 
 export default class Display {
   constructor({ size }) {
@@ -30,10 +39,12 @@ export default class Display {
         `## Focused window: ${file}\n` :
         `## Background window #${index}: ${file}\n`;
       const content = ['```', win.view(), '```'].join('\n');
+      const scroll = scrollStatus(win);
       const summary = index === 0 ? summarize(win) : '';
-      const displayed = [header, content, summary].join('\n');
+      const displayed = [header, content, scroll, summary].join('\n\n');
+      
       if (displayed.length + rendered.length < this.size) {
-        rendered += displayed;
+        rendered += displayed + '\n\n';
       } else {
         skipped += 1;
       }
