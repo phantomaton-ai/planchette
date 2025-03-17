@@ -1,27 +1,25 @@
-const tickquote = str => '`' + str + '`';
+const quote = str => '`' + str + '`';
 
-const summarize = win => {
-  let summary = '';
-
-  if (!win.selecting()) {
-    summary += `Cursor at position ${win.cursor}\n`;    
-  } else {
-    summary += `Selecting text from ${win.cursor} to ${win.end}:\n\n`;
-    summary += '```\n';
-    summary += `${win.selected()}`;
-    summary += '```\n';
-  }
-
-  return summary;
-};
-
-const scrollStatus = win => {
-  if (!win.scrolling()) {
-    return 'Full content shown';
-  }
+const status = win => {
+  let info = '';
   
-  const scroll = win.scrolled();
-  return `Showing lines ${scroll.start}-${scroll.end} of ${scroll.total}`;
+  // Add scroll information
+  const view = win.scrolled();
+  info += win.scrolling() 
+    ? `Lines ${view.start}-${view.end} of ${view.total}\n`
+    : `Full content shown\n`;
+
+  // Add cursor/selection information
+  if (!win.selecting()) {
+    info += `Cursor at position ${win.cursor}`;    
+  } else {
+    info += `Selecting text from ${win.cursor} to ${win.end}:\n\n`;
+    info += '```\n';
+    info += `${win.selected()}`;
+    info += '```\n';
+  }
+
+  return info;
 };
 
 export default class Display {
@@ -30,31 +28,29 @@ export default class Display {
   }
 
   render(windows) {
-    let rendered = '# Workspace\n\n';
-    let skipped = 0;
+    let text = '# Workspace\n\n';
+    let hidden = 0;
 
-    windows.forEach((win, index) => {
-      const file = tickquote(win.file.path);
-      const header = index === 0 ? 
-        `## Focused window: ${file}\n` :
-        `## Background window #${index}: ${file}\n`;
-      const content = ['```', win.view(), '```'].join('\n');
-      const scroll = scrollStatus(win);
-      const summary = index === 0 ? summarize(win) : '';
-      const displayed = [header, content, scroll, summary].join('\n\n');
+    windows.forEach((win, i) => {
+      const file = quote(win.file.path);
+      const head = i === 0 ? 
+        `## Focused: ${file}\n` :
+        `## Window ${i}: ${file}\n`;
+      const body = ['```', win.view(), '```'].join('\n');
+      const info = i === 0 ? status(win) : status(win).split('\n')[0]; // Just scroll info for background windows
+      const block = [head, body, info].join('\n\n');
       
-      if (displayed.length + rendered.length < this.size) {
-        rendered += displayed + '\n\n';
+      if (block.length + text.length < this.size) {
+        text += block + '\n\n';
       } else {
-        skipped += 1;
+        hidden += 1;
       }
     });
 
-    if (skipped > 0) {
-      rendered += '## Hidden\n\n';
-      rendered += `${skipped} windows hidden for space.`;
+    if (hidden > 0) {
+      text += `## Hidden: ${hidden} windows`;
     }
 
-    return rendered;
+    return text;
   }
 }
