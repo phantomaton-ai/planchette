@@ -1,5 +1,3 @@
-const quote = str => '`' + str + '`';
-
 const status = win => {
   let info = '';
   
@@ -37,7 +35,7 @@ export default class Display {
     let hidden = 0;
 
     windows.forEach((win, i) => {
-      const file = quote(win.file.path);
+      const file = '`' + win.file.path '`';
       const head = i === 0 ? 
         `## Focused: ${file}\n` :
         `## Window ${i}: ${file}\n`;
