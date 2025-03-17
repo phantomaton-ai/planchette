@@ -15,17 +15,17 @@ export default class Workspace {
   }
 
   open(path) {
-    const win = this.find(file) || new Window(file);
+    const win = this.find(path) || new Window(this.file(path));
     this.windows = [win, ...(this.windows.filter(w => win !== w))];
   }
   
   close(path) {
-    const win = this.find(file);
+    const win = this.find(path);
     this.windows = this.windows.filter(w => win !== w);
   }
 
-  focus(file) {
-    const win = this.find(file);
+  focus(path) {
+    const win = this.find(path);
     this.windows = [win, ...(this.windows.filter(w => win !== w))];
   }
 
