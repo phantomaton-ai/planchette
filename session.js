@@ -11,6 +11,6 @@ export default class Session {
   }
   
   display() {
-    return this.workspace.display();
+    return this.workspace.view();
   }
 }
