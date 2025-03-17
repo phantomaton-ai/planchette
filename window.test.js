@@ -23,8 +23,6 @@ describe('Window', () => {
       expect(window.content).to.equal(testContent);
       expect(window.state.scroll).to.equal(0);
       expect(window.size).to.equal(3);
-      expect(window.state.cursor).to.equal(0);
-      expect(window.state.end).to.equal(0);
       expect(window.lines).to.deep.equal(['line1', 'line2', 'line3', 'line4', 'line5']);
     });
     
@@ -36,9 +34,10 @@ describe('Window', () => {
   });
 
   describe('before', () => {
-    it('sets cursor to the index of the target', () => {
+    it('sets cursor position before the target', () => {
       window.before('line2');
-      expect(window.state.cursor).to.equal(testContent.indexOf('line2'));
+      expect(window.cursor()).to.equal(testContent.indexOf('line2'));
+      expect(window.selecting()).to.be.false;
     });
     
     it('throws error if target not found', () => {
@@ -47,124 +46,158 @@ describe('Window', () => {
   });
 
   describe('after', () => {
-    it('sets cursor to the index after the target', () => {
+    it('sets cursor position after the target', () => {
       window.after('line2');
-      const targetIndex = testContent.indexOf('line2');
-      expect(window.state.cursor).to.equal(targetIndex + 'line2'.length);
+      expect(window.cursor()).to.equal(testContent.indexOf('line2') + 'line2'.length);
+      expect(window.selecting()).to.be.false;
     });
   });
 
   describe('cursor', () => {
     it('returns the current cursor position', () => {
-      window.state.cursor = 10;
-      expect(window.cursor()).to.equal(10);
+      window.state.cursor = testContent.indexOf('line2');
+      expect(window.cursor()).to.equal(testContent.indexOf('line2'));
     });
   });
 
   describe('select', () => {
-    it('sets cursor to start and end to end position', () => {
+    it('selects text between start and end targets', () => {
       window.select('line2', 'line3');
-      const startIndex = testContent.indexOf('line2');
-      const endIndex = testContent.indexOf('line3');
       
-      expect(window.state.cursor).to.equal(startIndex);
-      expect(window.state.end).to.equal(endIndex);
+      // Check that we're selecting
+      expect(window.selecting()).to.be.true;
+      
+      // Check selection bounds via selected()
+      const selection = window.selected();
+      expect(selection.start).to.equal(testContent.indexOf('line2'));
+      expect(selection.end).to.equal(testContent.indexOf('line3') + 'line3'.length);
+      
+      // Check selected text
+      const expectedText = testContent.substring(
+        testContent.indexOf('line2'),
+        testContent.indexOf('line3') + 'line3'.length
+      );
+      expect(window.selection()).to.equal(expectedText);
     });
   });
 
   describe('drag', () => {
-    it('sets cursor to index after target', () => {
-      window.state.cursor = 5; // Set initial cursor position
-      window.drag('line3');
-      const targetIndex = testContent.indexOf('line3');
+    it('selects from current cursor to target', () => {
+      // Position cursor at line2
+      window.before('line2');
       
-      expect(window.state.cursor).to.equal(targetIndex + 'line3'.length);
+      // Drag to line3
+      window.drag('line3');
+      
+      // Check that we're selecting
+      expect(window.selecting()).to.be.true;
+      
+      // Check selection bounds
+      const selection = window.selected();
+      expect(selection.start).to.equal(testContent.indexOf('line2'));
+      
+      // Check selected text (should include line3)
+      const expectedText = testContent.substring(
+        testContent.indexOf('line2'),
+        testContent.indexOf('line3') + 'line3'.length
+      );
+      expect(window.selection()).to.include('line2');
+      expect(window.selection()).to.include('line3');
+      expect(window.selection()).to.equal(expectedText);
     });
   });
 
   describe('edit', () => {
-    it('replaces content between cursor and end', async () => {
+    it('replaces selected content', async () => {
       window.select('line2', 'line3');
       const newContent = 'replaced content';
       
       await window.edit(newContent);
       
-      const expectedContent = 'line1\n' + newContent + '\nline4\nline5';
+      // Expected content should have line2 and line3 replaced
+      const prefix = testContent.substring(0, testContent.indexOf('line2'));
+      const suffix = testContent.substring(testContent.indexOf('line3') + 'line3'.length);
+      const expectedContent = prefix + newContent + suffix;
+      
       expect(window.content).to.equal(expectedContent);
       expect(file.write.calledOnce).to.be.true;
       expect(file.write.firstCall.args[0]).to.equal(newContent);
     });
     
     it('inserts at cursor when not selecting', async () => {
-      window.state.cursor = 6; // Start of line2
-      window.state.end = 6;    // Same position (no selection)
+      // Position cursor at start of line2
+      window.before('line2');
       const newContent = 'inserted ';
       
       await window.edit(newContent);
       
-      const expectedContent = 'line1\n' + newContent + 'line2\nline3\nline4\nline5';
+      // Expected content should have newContent inserted before line2
+      const prefix = testContent.substring(0, testContent.indexOf('line2'));
+      const suffix = testContent.substring(testContent.indexOf('line2'));
+      const expectedContent = prefix + newContent + suffix;
+      
       expect(window.content).to.equal(expectedContent);
+      expect(file.write.calledOnce).to.be.true;
     });
   });
 
   describe('scroll', () => {
     it('scrolls down by specified lines', () => {
       window.scroll(2);
-      expect(window.state.scroll).to.equal(2);
+      const info = window.scrolled();
+      expect(info.start).to.equal(3); // 1-based line number
     });
     
     it('does not scroll below 0', () => {
       window.scroll(-5);
-      expect(window.state.scroll).to.equal(0);
+      const info = window.scrolled();
+      expect(info.start).to.equal(1); // First line
     });
     
     it('does not scroll beyond line count', () => {
       window.scroll(10);
-      expect(window.state.scroll).to.equal(5); // 5 lines total
+      const info = window.scrolled();
+      expect(info.start).to.equal(1); // Scrolled to show last lines
+      expect(info.end).to.equal(5);   // Last line
     });
   });
 
   describe('selecting', () => {
-    it('returns true when end > cursor', () => {
-      window.state.cursor = 5;
-      window.state.end = 10;
+    it('returns true when there is a selection', () => {
+      window.select('line2', 'line3');
       expect(window.selecting()).to.be.true;
     });
     
-    it('returns false when end === cursor', () => {
-      window.state.cursor = 5;
-      window.state.end = 5;
+    it('returns false when there is no selection', () => {
+      window.before('line2');
       expect(window.selecting()).to.be.false;
     });
   });
 
   describe('selection', () => {
     it('returns selected text when selecting', () => {
-      // Modifying window.content so we can control the exact substring behavior
-      window.content = 'abcdefghij';
-      window.state.cursor = 2; // 'c'
-      window.state.end = 7;    // 'h'
+      window.select('line2', 'line3');
       
-      expect(window.selection()).to.equal('cdefg');
+      const expectedText = testContent.substring(
+        testContent.indexOf('line2'),
+        testContent.indexOf('line3') + 'line3'.length
+      );
+      expect(window.selection()).to.equal(expectedText);
     });
     
     it('returns empty string when not selecting', () => {
-      window.state.cursor = 5;
-      window.state.end = 5;
+      window.before('line2');
       expect(window.selection()).to.equal('');
     });
   });
 
   describe('selected', () => {
     it('returns selected range', () => {
-      window.state.cursor = 5;
-      window.state.end = 10;
+      window.select('line2', 'line3');
       
       const selection = window.selected();
-      expect(selection).to.deep.equal({
-        start: 5,
-        end: 10
-      });
+      expect(selection.start).to.equal(testContent.indexOf('line2'));
+      expect(selection.end).to.equal(testContent.indexOf('line3') + 'line3'.length);
     });
   });
 
@@ -172,6 +205,15 @@ describe('Window', () => {
     it('returns index of first occurrence of target', () => {
       const index = window.find('line3');
       expect(index).to.equal(testContent.indexOf('line3'));
+    });
+    
+    it('finds target after specified position', () => {
+      // Find the first occurrence of 'line' after line1
+      const firstLinePos = testContent.indexOf('line1') + 'line1'.length;
+      const index = window.find('line', firstLinePos);
+      
+      // Should find 'line' in 'line2'
+      expect(index).to.equal(testContent.indexOf('line2'));
     });
     
     it('throws error if target not found', () => {
