@@ -39,14 +39,21 @@ describe('Display', () => {
     });
     
     it('renders a background window with only scroll information', () => {
-      // Add a second window
-      const window2 = { ...window, file: { path: 'second.js' } };
+      // Add a second window with a different cursor position
+      const window2 = { 
+        ...window, 
+        file: { path: 'second.js' },
+        cursor: 11  // Different cursor position
+      };
+      
       const result = display.render([window, window2]);
       
       expect(result).to.include('## Window 1: `second.js`');
       expect(result).to.include('Lines 1-20 of 100');
+      
       // Should not include cursor information for background window
-      expect(result).not.to.include('Cursor at position 10');
+      // Specifically check for the cursor position of window2
+      expect(result).not.to.include('Cursor at position 11');
     });
     
     it('shows selection information when window has selection', () => {
