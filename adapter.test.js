@@ -8,10 +8,9 @@ describe('Adapter', () => {
   let adapter;
   let fsStub;
   
-  const testRoot = '/test/root';
-  const testFile = 'test.txt';
+  const testFile = '/test/path/test.txt';
   const testContent = 'Test file content';
-  const fullPath = path.resolve(testRoot, testFile);
+  const testDir = path.dirname(testFile);
   
   beforeEach(() => {
     // Stub fs module methods
@@ -22,7 +21,7 @@ describe('Adapter', () => {
       mkdir: stub(fs, 'mkdir').resolves()
     };
     
-    adapter = new Adapter(testRoot);
+    adapter = new Adapter();
   });
   
   afterEach(() => {
@@ -35,7 +34,7 @@ describe('Adapter', () => {
       const content = await adapter.read(testFile);
       
       expect(fsStub.readFile.calledOnce).to.be.true;
-      expect(fsStub.readFile.firstCall.args[0]).to.equal(fullPath);
+      expect(fsStub.readFile.firstCall.args[0]).to.equal(testFile);
       expect(fsStub.readFile.firstCall.args[1]).to.equal('utf-8');
       expect(content).to.equal(testContent);
     });
@@ -54,12 +53,12 @@ describe('Adapter', () => {
       
       // Should ensure directory exists first
       expect(fsStub.mkdir.calledOnce).to.be.true;
-      expect(fsStub.mkdir.firstCall.args[0]).to.equal(path.dirname(fullPath));
+      expect(fsStub.mkdir.firstCall.args[0]).to.equal(testDir);
       expect(fsStub.mkdir.firstCall.args[1]).to.deep.equal({ recursive: true });
       
       // Then write the file
       expect(fsStub.writeFile.calledOnce).to.be.true;
-      expect(fsStub.writeFile.firstCall.args[0]).to.equal(fullPath);
+      expect(fsStub.writeFile.firstCall.args[0]).to.equal(testFile);
       expect(fsStub.writeFile.firstCall.args[1]).to.equal(testContent);
       expect(fsStub.writeFile.firstCall.args[2]).to.equal('utf-8');
     });
@@ -77,7 +76,7 @@ describe('Adapter', () => {
       await adapter.remove(testFile);
       
       expect(fsStub.unlink.calledOnce).to.be.true;
-      expect(fsStub.unlink.firstCall.args[0]).to.equal(fullPath);
+      expect(fsStub.unlink.firstCall.args[0]).to.equal(testFile);
     });
     
     it('propagates errors from file removal', async () => {
@@ -85,19 +84,6 @@ describe('Adapter', () => {
       fsStub.unlink.rejects(error);
       
       await expect(adapter.remove(testFile)).to.be.rejectedWith(error);
-    });
-  });
-  
-  describe('constructor', () => {
-    it('uses process.cwd() as default root', () => {
-      const cwd = process.cwd();
-      const defaultAdapter = new Adapter();
-      
-      expect(defaultAdapter.root).to.equal(cwd);
-    });
-    
-    it('uses provided root path', () => {
-      expect(adapter.root).to.equal(testRoot);
     });
   });
 });
