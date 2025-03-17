@@ -60,6 +60,19 @@ export default class Window {
   }
 
   view() {
-    return this.lines.slice(this.scroll, this.size).join('\n');
+    return this.lines.slice(this.scroll, this.scroll + this.size).join('\n');
+  }
+  
+  scrollInfo() {
+    const visibleStart = this.scroll + 1; // 1-based line numbers for display
+    const visibleEnd = Math.min(this.scroll + this.size, this.lines.length);
+    const totalLines = this.lines.length;
+    
+    return {
+      visibleStart,
+      visibleEnd,
+      totalLines,
+      isComplete: visibleEnd === totalLines && visibleStart === 1
+    };
   }
 }
