@@ -9,18 +9,25 @@ export default class Workspace {
   }
 
   open(file) {
-    // TODO
+    const win = this.find(file) || new Window(file);
+    this.windows = [win, ...this.windows.filter(w => win !== w)];
   }
   
   close(file) {
-    // TODO
+    const win = this.find(file);
+    this.windows = this.windows.filter(w => win !== w)];
   }
-  
+
   focus(file) {
-    // TODO
+    const win = this.find(file);
+    this.windows = [win, ...this.windows.filter(w => win !== w)];
   }
 
   display() {
-    // TODO
+    // TODO: render
+  }
+
+  find(file) {
+    return this.windows.find(w => w.file === file);
   }
 }
