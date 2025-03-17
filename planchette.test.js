@@ -9,8 +9,8 @@ describe('Planchette', () => {
   const tmp = os.tmpdir();
 
   it('starts a session', () => {
-    const session = planchette({ root: tmp });
+    const session = planchette({ home: tmp });
     expect(session).instanceof(Session);
-    expect(session.root).to.equal(tmp);
+    expect(session.workspace.home).to.equal(tmp);
   });
 });
