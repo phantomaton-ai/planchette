@@ -7,7 +7,7 @@ const validate(index) {
 export default class Window {
   constructor(file, options = {}) {
     this.file = file;
-    this.content = content; // TODO from where?
+    this.content = content; // TODO: read
     this.scroll = options.scroll || 0;
     this.lines = content.split('\n');
     this.size = options.size || 100;
