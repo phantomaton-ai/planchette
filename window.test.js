@@ -84,13 +84,12 @@ describe('Window', () => {
 
   describe('edit', () => {
     it('replaces content between cursor and end', async () => {
-      window.state.cursor = 6; // Start of line2
-      window.state.end = 17;   // Start of line4
+      window.select('line2', 'line3');
       const newContent = 'replaced content';
       
       await window.edit(newContent);
       
-      const expectedContent = 'line1\n' + newContent + 'line4\nline5';
+      const expectedContent = 'line1\n' + newContent + '\nline4\nline5';
       expect(window.content).to.equal(expectedContent);
       expect(file.write.calledOnce).to.be.true;
       expect(file.write.firstCall.args[0]).to.equal(newContent);

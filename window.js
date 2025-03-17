@@ -31,11 +31,11 @@ export default class Window {
   
   select(start, end) {
     this.state.cursor = this.find(start);
-    this.state.end = this.find(end);
+    this.state.end = this.find(end, this.state.cursor) + end.length;
   }
   
   drag(target) {
-    this.state.cursor = this.find(target) + target.length;
+    this.select(this.state.cursor, this.find(target, this.state.cursor));
   }
   
   async edit(content) {
@@ -61,12 +61,12 @@ export default class Window {
     return this.state.end > this.state.cursor;
   }
 
-  find(target) {
-    const index = this.content.indexOf(target);
+  find(target, skip = 0) {
+    const index = this.content.slice(skip).indexOf(target);
     if (index < 0) {
       throw new Error(`Cannot find ${target}`);
     }
-    return index;
+    return index + skip;
   }
 
   view() {
