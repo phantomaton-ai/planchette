@@ -1,13 +1,13 @@
 const quote = str => '`' + str + '`';
 
-const scrollInfo = win => {
+const scroll = win => {
   const view = win.scrolled();
   return win.scrolling() 
     ? `Lines ${view.start}-${view.end} of ${view.total}`
     : `Full content shown`;
 };
 
-const cursorInfo = win => {
+const cursor = win => {
   if (!win.selecting()) {
     return `Cursor at position ${win.cursor}`;    
   } else {
@@ -40,12 +40,12 @@ export default class Display {
       const body = ['```', win.view(), '```'].join('\n');
       
       // Always show scroll info
-      const scroll = scrollInfo(win);
+      const scrollStatus = scroll(win);
       
       // Only show cursor info for focused window
       const info = i === 0 ? 
-        [scroll, cursorInfo(win)].join('\n\n') : 
-        scroll;
+        [scrollStatus, cursor(win)].join('\n\n') : 
+        scrollStatus;
       
       const block = [head, body, info].join('\n\n');
       
