@@ -19,10 +19,12 @@ export default class Window {
 
   before(target) {
     this.state.cursor = this.find(target);
+    this.state.end = this.state.cursor;
   }
   
   after(target) {
     this.state.cursor = this.find(target) + target.length;
+    this.state.end = this.state.cursor;
   }
 
   cursor() {
@@ -30,12 +32,25 @@ export default class Window {
   }
   
   select(start, end) {
-    this.state.cursor = this.find(start);
-    this.state.end = this.find(end, this.state.cursor) + end.length;
+    // If start is a string, find its position
+    if (typeof start === 'string') {
+      this.state.cursor = this.find(start);
+    } else {
+      this.state.cursor = start;
+    }
+    
+    // If end is a string, find its position
+    if (typeof end === 'string') {
+      this.state.end = this.find(end) + end.length;
+    } else {
+      this.state.end = end;
+    }
   }
   
   drag(target) {
-    this.select(this.state.cursor, this.find(target, this.state.cursor));
+    const start = this.state.cursor;
+    const end = this.find(target) + target.length;
+    this.select(start, end);
   }
   
   async edit(content) {
@@ -46,7 +61,9 @@ export default class Window {
   }
   
   scroll(lines) {
-    this.state.scroll = Math.max(0, Math.min(this.lines.length, this.state.scroll + lines));
+    // Calculate new scroll position
+    const newScroll = Math.max(0, Math.min(this.lines.length - 1, this.state.scroll + lines));
+    this.state.scroll = newScroll;
   }
 
   selection() {
@@ -62,11 +79,16 @@ export default class Window {
   }
 
   find(target, skip = 0) {
-    const index = this.content.slice(skip).indexOf(target);
+    // Handle non-string targets
+    if (typeof target !== 'string') {
+      throw new Error(`Cannot find ${target}`);
+    }
+    
+    const index = this.content.indexOf(target, skip);
     if (index < 0) {
       throw new Error(`Cannot find ${target}`);
     }
-    return index + skip;
+    return index;
   }
 
   view() {
