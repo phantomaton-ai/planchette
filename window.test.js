@@ -157,7 +157,7 @@ describe('Window', () => {
     it('does not scroll beyond line count', () => {
       window.scroll(10);
       const info = window.scrolled();
-      expect(info.start).to.equal(1); // Scrolled to show last lines
+      expect(info.start).to.equal(3); // Scrolled to show last lines
       expect(info.end).to.equal(5);   // Last line
     });
   });

@@ -32,25 +32,12 @@ export default class Window {
   }
   
   select(start, end) {
-    // If start is a string, find its position
-    if (typeof start === 'string') {
-      this.state.cursor = this.find(start);
-    } else {
-      this.state.cursor = start;
-    }
-    
-    // If end is a string, find its position
-    if (typeof end === 'string') {
-      this.state.end = this.find(end) + end.length;
-    } else {
-      this.state.end = end;
-    }
+    this.state.cursor = this.find(start);
+    this.state.end = this.find(end, this.state.cursor) + end.length;
   }
   
   drag(target) {
-    const start = this.state.cursor;
-    const end = this.find(target) + target.length;
-    this.select(start, end);
+    this.state.end = this.find(target, this.state.cursor) + target.length;
   }
   
   async edit(content) {
@@ -61,9 +48,10 @@ export default class Window {
   }
   
   scroll(lines) {
-    // Calculate new scroll position
-    const newScroll = Math.max(0, Math.min(this.lines.length - 1, this.state.scroll + lines));
-    this.state.scroll = newScroll;
+    this.state.scroll = Math.max(0, Math.min(
+      this.lines.length - this.size,
+      this.state.scroll + lines)
+    );
   }
 
   selection() {
