@@ -10,13 +10,14 @@ describe('Display', () => {
     
     // Create a stub window object with all the methods we need
     window = {
+      cursor: stub().returns(10),
       file: { path: 'test.js' },
       view: stub().returns('const test = true;'),
       scrolling: stub().returns(true),
       scrolled: stub().returns({ start: 1, end: 20, total: 100 }),
       selecting: stub().returns(false),
-      cursor: 10,
-      selected: stub().returns('selected text')
+      selected: stub().returns({ start: 10, end: 10 }),
+      selection: stub().returns('selected text')
     };
   });
 

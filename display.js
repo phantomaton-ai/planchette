@@ -9,11 +9,12 @@ const scroll = win => {
 
 const cursor = win => {
   if (!win.selecting()) {
-    return `Cursor at position ${win.cursor}`;    
+    return `Cursor at position ${win.cursor()}`;    
   } else {
-    return `Selecting text from ${win.cursor} to ${win.end}:\n\n` +
+    const { start, end } = win.selected();
+    return `Selecting text from ${start} to ${end}:\n\n` +
            '```\n' +
-           `${win.selected()}` +
+           `${win.selection()}` +
            '```\n';
   }
 };
