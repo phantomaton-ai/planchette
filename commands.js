@@ -1,14 +1,12 @@
 import metamagic from 'metamagic';
 
-
-
 export default function createCommands(workspace) {
   return [
     metamagic(
       'open', 
       ({ file }) => workspace.open(file), 
       {
-        attributes: { file: 'File to open' },
+        attributes: { file: { description: 'File to open' } },
         description: 'Open the specified file in the current Workspace',
         example: {
           attributes: { file: 'test.txt' },
@@ -17,15 +15,12 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('close', 
+    metamagic(
+      'close', 
       ({ file }) => workspace.close(file), 
       {
-        attributes: {
-          file: {
-            description: 'File to close',
-            validate: (file) => typeof file === 'string'
-          }
-        },
+        attributes: { file: { description: 'File to close' } },
+        description: 'Close the specified file in the current Workspace',
         example: {
           attributes: { file: 'test.txt' },
           description: 'Close the file test.txt'
@@ -33,15 +28,12 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('focus', 
+    metamagic(
+      'focus', 
       ({ file }) => workspace.focus(file), 
       {
-        attributes: {
-          file: {
-            description: 'File to focus on',
-            validate: (file) => typeof file === 'string'
-          }
-        },
+        attributes: { file: { description: 'File to focus on' } },
+        description: 'Focus on a specific file in the current Workspace',
         example: {
           attributes: { file: 'utils.js' },
           description: 'Focus on the file utils.js'
@@ -49,15 +41,12 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('before', 
+    metamagic(
+      'before', 
       ({ target }) => workspace.current().before(target), 
       {
-        attributes: {
-          target: {
-            description: 'Text to position cursor before',
-            validate: (target) => typeof target === 'string'
-          }
-        },
+        attributes: { target: { description: 'Text to position cursor before' } },
+        description: 'Position the cursor before specified text in the focused Window',
         example: {
           attributes: { target: 'function' },
           description: 'Position cursor before the first occurrence of "function"'
@@ -65,15 +54,12 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('after', 
+    metamagic(
+      'after', 
       ({ target }) => workspace.current().after(target), 
       {
-        attributes: {
-          target: {
-            description: 'Text to position cursor after',
-            validate: (target) => typeof target === 'string'
-          }
-        },
+        attributes: { target: { description: 'Text to position cursor after' } },
+        description: 'Position the cursor after specified text in the focused Window',
         example: {
           attributes: { target: 'import' },
           description: 'Position cursor after the first occurrence of "import"'
@@ -81,19 +67,15 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('select', 
+    metamagic(
+      'select', 
       ({ start, end }) => workspace.current().select(start, end), 
       {
-        attributes: {
-          start: {
-            description: 'Start marker for text selection',
-            validate: (start) => typeof start === 'string'
-          },
-          end: {
-            description: 'End marker for text selection',
-            validate: (end) => typeof end === 'string'
-          }
+        attributes: { 
+          start: { description: 'Start marker for text selection' },
+          end: { description: 'End marker for text selection' }
         },
+        description: 'Select text between start and end markers in the focused Window',
         example: {
           attributes: { start: 'function', end: '}' },
           description: 'Select text from "function" to the next "}"'
@@ -101,15 +83,12 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('drag', 
+    metamagic(
+      'drag', 
       ({ target }) => workspace.current().drag(target), 
       {
-        attributes: {
-          target: {
-            description: 'Text to drag selection to',
-            validate: (target) => typeof target === 'string'
-          }
-        },
+        attributes: { target: { description: 'Text to drag selection to' } },
+        description: 'Select text from current cursor position to specified target in the focused Window',
         example: {
           attributes: { target: ';' },
           description: 'Select from current position to the next ";"'
@@ -117,15 +96,12 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('edit', 
+    metamagic(
+      'edit', 
       ({ content }) => workspace.current().edit(content), 
       {
-        attributes: {
-          content: {
-            description: 'Content to replace or insert',
-            validate: (content) => typeof content === 'string'
-          }
-        },
+        attributes: { content: { description: 'Content to replace or insert' } },
+        description: 'Replace selected text or insert at cursor in the focused Window',
         example: {
           attributes: { content: 'const newFunction = () => {};' },
           description: 'Replace selected text with a new function'
@@ -133,15 +109,17 @@ export default function createCommands(workspace) {
       }
     ),
 
-    metamagic('scroll', 
+    metamagic(
+      'scroll', 
       ({ lines }) => workspace.current().scroll(parseInt(lines)), 
       {
-        attributes: {
-          lines: {
+        attributes: { 
+          lines: { 
             description: 'Number of lines to scroll',
             validate: (lines) => typeof lines === 'string' && !isNaN(parseInt(lines))
-          }
+          } 
         },
+        description: 'Scroll the focused Window up or down by specified lines',
         example: {
           attributes: { lines: '10' },
           description: 'Scroll down 10 lines'
