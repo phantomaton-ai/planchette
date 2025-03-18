@@ -1,16 +1,15 @@
 import metamagic from 'metamagic';
 
+
+
 export default function createCommands(workspace) {
   return [
-    metamagic('open', 
+    metamagic(
+      'open', 
       ({ file }) => workspace.open(file), 
       {
-        attributes: {
-          file: {
-            description: 'File to open',
-            validate: (file) => typeof file === 'string'
-          }
-        },
+        attributes: { file: { description: 'File to open' } },
+        description: 'Open the specified file in the current Workspace',
         example: {
           attributes: { file: 'test.txt' },
           description: 'Open the file test.txt'
