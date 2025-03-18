@@ -40,53 +40,6 @@ Planchette is designed to be integrated with LLM-powered applications. There are
 1. **Commands** - These should be exposed as tools/functions to the LLM
 2. **Workspace Display** - This should be included in the system prompt to show the LLM the current state
 
-#### Example Integration
-
-```javascript
-import planchette from 'planchette';
-
-// Initialize planchette
-const session = planchette({ home: projectPath });
-
-// When setting up your LLM interaction:
-const tools = session.commands().map(command => ({
-  type: 'function',
-  function: {
-    name: command.name,
-    description: command.description,
-    parameters: {
-      type: 'object',
-      properties: command.example.options
-    },
-    execute: command.perform
-  }
-}));
-
-// Include workspace display in system prompt
-const systemPrompt = `
-You are a coding assistant with access to the following workspace:
-
-${session.display()}
-
-Use the available tools to navigate and edit files.
-`;
-
-// When the LLM calls a tool, execute it and update the system prompt
-async function handleToolCall(toolCall) {
-  const command = session.commands().find(cmd => cmd.name === toolCall.name);
-  await command.perform(toolCall.arguments);
-  
-  // Update the system prompt with the new workspace state
-  return `
-  You are a coding assistant with access to the following workspace:
-  
-  ${session.display()}
-  
-  Use the available tools to navigate and edit files.
-  `;
-}
-```
-
 ## Command Structure 📝
 
 Each command in Planchette's command array has the following structure:
@@ -149,28 +102,27 @@ The workspace display is a formatted text representation of the current state, i
 
 Example output:
 
-```
-# Workspace
+    # Workspace
+    
+    ## Focused: `app.js`
+    ```
+    function hello() {
+      console.log("Hello world");
+    }
+    ```
+    Lines 1-3 of 10
+    Cursor at position 12
+    
+    ## Window 1: `utils.js`
+    ```
+    export function helper() {
+      return 'utility function';
+    }
+    ```
+    Lines 1-3 of 5
+    ```
 
-## Focused: `app.js`
-```
-function hello() {
-  console.log("Hello world");
-}
-```
-Lines 1-3 of 10
-Cursor at position 12
-
-## Window 1: `utils.js`
-```
-export function helper() {
-  return 'utility function';
-}
-```
-Lines 1-3 of 5
-```
-
-This display must be included in the LLM's system prompt to provide context about the current workspace state.
+This display may be included in the LLM's system prompt to provide context about the current workspace state.
 
 ## Architecture 🏗️
 
