@@ -1,32 +1,22 @@
-# Planchette
+# Planchette 🔮
 
 A spectral project management tool for Large Language Models.
 
-<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Planchette1.JPG/320px-Planchette1.JPG" align="right" width="150" alt="Planchette">
-
-## Overview
+## Overview 👁️
 
 Planchette is a tool designed for LLMs to manage projects and interact with files. The name references the pointer used on a ouija board, as a metaphor for a tool that lends agency to an unseen force.
 
 Planchette provides file operations, text editing, and a windowed workspace view designed specifically for LLMs to effectively manipulate and navigate text files without having to rewrite entire files for each change.
 
-## Features
-
-- **File Management** - Open, close, and focus on multiple files
-- **Text Selection** - Position cursor, select text ranges, and drag selections
-- **Editing** - Replace selections or insert at cursor position
-- **Navigation** - Scroll through file content
-- **Workspace View** - See open files and current state in a formatted display
-
-## Installation
+## Installation 📦
 
 ```bash
 npm install planchette
 ```
 
-## Usage
+## Usage 🛠️
 
-### Basic Usage
+### Basic Setup
 
 ```javascript
 import planchette from 'planchette';
@@ -39,64 +29,125 @@ const session = planchette({
 // Get available commands
 const commands = session.commands();
 
-// Find specific commands
-const openCmd = commands.find(cmd => cmd.name === 'open');
-const editCmd = commands.find(cmd => cmd.name === 'edit');
-
-// Use commands
-await openCmd.perform({ file: 'example.js' });
-await editCmd.perform({ content: '// Add a new comment\n' });
-
 // Get workspace representation
 const display = session.display();
-console.log(display);
 ```
 
-### Core Commands
+### Integration with LLMs 🧠
 
-Planchette provides a set of commands for LLMs to interact with files:
+Planchette is designed to be integrated with LLM-powered applications. There are two key components that you'll need to incorporate:
 
-- **open(file)** - Open a file in the workspace
-- **close(file)** - Close a file
-- **focus(file)** - Focus on an open file
-- **before(target)** - Position cursor before text
-- **after(target)** - Position cursor after text
-- **select(start, end)** - Select text between start and end
-- **drag(target)** - Select from cursor to target
-- **edit(content)** - Replace selection or insert at cursor
-- **scroll(lines)** - Scroll up or down
+1. **Commands** - These should be exposed as tools/functions to the LLM
+2. **Workspace Display** - This should be included in the system prompt to show the LLM the current state
 
-### Example Workflow
+#### Example Integration
 
 ```javascript
-// Open a file
-await openCmd.perform({ file: 'app.js' });
+import planchette from 'planchette';
 
-// Position cursor before specific text
-beforeCmd.perform({ target: 'function main' });
+// Initialize planchette
+const session = planchette({ home: projectPath });
 
-// Add a comment above the function
-await editCmd.perform({ content: '// Main application entry point\n' });
+// When setting up your LLM interaction:
+const tools = session.commands().map(command => ({
+  type: 'function',
+  function: {
+    name: command.name,
+    description: command.description,
+    parameters: {
+      type: 'object',
+      properties: command.example.options
+    },
+    execute: command.perform
+  }
+}));
 
-// Select the function signature
-selectCmd.perform({ start: 'function main', end: ') {' });
+// Include workspace display in system prompt
+const systemPrompt = `
+You are a coding assistant with access to the following workspace:
 
-// Replace it with an updated signature
-await editCmd.perform({ content: 'function main(options = {})' });
+${session.display()}
+
+Use the available tools to navigate and edit files.
+`;
+
+// When the LLM calls a tool, execute it and update the system prompt
+async function handleToolCall(toolCall) {
+  const command = session.commands().find(cmd => cmd.name === toolCall.name);
+  await command.perform(toolCall.arguments);
+  
+  // Update the system prompt with the new workspace state
+  return `
+  You are a coding assistant with access to the following workspace:
+  
+  ${session.display()}
+  
+  Use the available tools to navigate and edit files.
+  `;
+}
 ```
 
-## Architecture
+## Command Structure 📝
 
-Planchette follows a modular architecture with the following key components:
+Each command in Planchette's command array has the following structure:
 
-- **Session** - Manages the overall environment and workspace
-- **Workspace** - Tracks open files and windows
-- **Window** - Provides view into a file with cursor and selection state
-- **Commands** - Implements operations for the LLM to use
+```javascript
+{
+  name: 'commandName',       // Name of the command
+  description: 'Detailed description of what the command does',
+  example: {
+    description: 'Example usage description',
+    options: { /* parameter examples */ }
+  },
+  perform: (options) => {},  // Function that performs the command
+  validate: (options) => {}  // Validates the command parameters
+}
+```
 
-## Workspace Display
+When integrating with an LLM, you should:
 
-The workspace is displayed to the LLM with file content, cursor information, and selection state:
+1. Map these commands to the function-calling capabilities of your LLM
+2. Use the `validate` function to verify parameters before execution
+3. Call the `perform` function with the parameters provided by the LLM
+
+## Available Features ✨
+
+Planchette provides functionality in these core areas:
+
+### File Management
+
+- Opening files in the workspace
+- Closing files when no longer needed
+- Focusing on different files in the workspace
+
+### Text Navigation
+
+- Positioning the cursor before/after specific text
+- Selecting text ranges between markers
+- Dragging selections from cursor to target
+
+### Text Editing
+
+- Replacing selected text
+- Inserting at cursor position
+- Making incremental changes to files
+
+### Content Viewing
+
+- Scrolling through file content
+- Displaying visible portions of files
+- Showing cursor and selection state
+
+## Workspace Display 🖥️
+
+The workspace display is a formatted text representation of the current state, including:
+
+- Open files with their content
+- Current focus highlighting
+- Cursor position and/or text selection
+- Scrolling position information
+
+Example output:
 
 ```
 # Workspace
@@ -107,7 +158,7 @@ function hello() {
   console.log("Hello world");
 }
 ```
-Showing lines 1-3 of 10
+Lines 1-3 of 10
 Cursor at position 12
 
 ## Window 1: `utils.js`
@@ -116,9 +167,24 @@ export function helper() {
   return 'utility function';
 }
 ```
-Showing lines 1-3 of 5
+Lines 1-3 of 5
 ```
 
-## License
+This display must be included in the LLM's system prompt to provide context about the current workspace state.
 
-MIT
+## Architecture 🏗️
+
+Planchette follows a modular architecture with these key components:
+
+- **Session** - Manages the overall environment and provides the main API
+- **Workspace** - Tracks open files and their windows
+- **Window** - Provides a view into a file with cursor/selection state
+- **Commands** - Implements operations exposed to the LLM
+
+## Contributing 🦄
+
+We welcome contributions to the Planchette project! If you have any ideas, bug reports, or pull requests, please feel free to submit them on the [GitHub repository](https://github.com/phantomaton-ai/planchette).
+
+## License 📄
+
+Planchette is licensed under the [MIT License](LICENSE).
