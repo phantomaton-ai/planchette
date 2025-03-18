@@ -1,6 +1,6 @@
 {
   "name": "planchette",
-  "version": "0.0.0",
+  "version": "0.2.0",
   "main": "planchette.js",
   "scripts": {
     "all": "lovecraft -a",
@@ -19,6 +19,6 @@
   "description": "",
   "type": "module",
   "devDependencies": {
-    "lovecraft": "^1.1.2"
+    "lovecraft": "^1.1.4"
   }
 }
