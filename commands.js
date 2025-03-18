@@ -86,8 +86,8 @@ const commands = workspace => [
       description: 'Scroll down 10 lines',
       options: { lines: 10 }
     },
-    perform: ({ lines }) => workspace.current().scroll(lines),
-    validate: ({ lines }) => typeof lines === 'number',
+    perform: ({ lines }) => workspace.current().scroll(parseInt(lines)),
+    validate: ({ lines }) => typeof lines === 'string' && !isNaN(parseInt(lines)),
   }
 ];
 

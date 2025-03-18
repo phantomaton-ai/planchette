@@ -245,14 +245,14 @@ describe('Commands', () => {
     });
     
     it('validates lines parameter', () => {
-      expect(scrollCmd.validate({ lines: 10 })).to.be.true;
-      expect(scrollCmd.validate({ lines: -5 })).to.be.true; // Negative numbers are valid
-      expect(scrollCmd.validate({ lines: '10' })).to.be.false;
+      expect(scrollCmd.validate({ lines: '10' })).to.be.true;
+      expect(scrollCmd.validate({ lines: '-5' })).to.be.true; // Negative numbers are valid
+      expect(scrollCmd.validate({ lines: 'foo' })).to.be.false;
       expect(scrollCmd.validate({})).to.be.false;
     });
     
     it('calls window.scroll with lines parameter', () => {
-      scrollCmd.perform({ lines: 10 });
+      scrollCmd.perform({ lines: '10' });
       expect(window.scroll.calledOnce).to.be.true;
       expect(window.scroll.firstCall.args[0]).to.equal(10);
     });
