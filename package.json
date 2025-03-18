@@ -19,6 +19,6 @@
   "description": "",
   "type": "module",
   "devDependencies": {
-    "lovecraft": "^1.1.4"
+    "lovecraft": "^1.1.2"
   }
 }
