@@ -19,11 +19,6 @@ describe('Planchette', () => {
   // Setup test files in temporary directory
   before(async () => {
     await fs.mkdir(testDir, { recursive: true });
-    
-    // Create test files
-    for (const [filename, content] of Object.entries(testFiles)) {
-      await fs.writeFile(path.join(testDir, filename), content);
-    }
   });
   
   // Clean up test files
@@ -35,7 +30,12 @@ describe('Planchette', () => {
     }
   });
   
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Create test files
+    for (const [filename, content] of Object.entries(testFiles)) {
+      await fs.writeFile(path.join(testDir, filename), content);
+    }
+
     // Create fresh session for each test
     session = planchette({ home: testDir });
   });
@@ -165,7 +165,7 @@ describe('Planchette', () => {
   
   it('scrolls through file content', async () => {
     // Create a larger test file with many lines
-    const manyLines = Array.from({ length: 50 }, (_, i) => `Line ${i + 1}`).join('\n');
+    const manyLines = Array.from({ length: 500 }, (_, i) => `Line ${i + 1}`).join('\n');
     await fs.writeFile(path.join(testDir, 'large.txt'), manyLines);
     
     // Get commands
@@ -181,11 +181,11 @@ describe('Planchette', () => {
     expect(display).to.include('Line 1');
     
     // Scroll down
-    scrollCmd.perform({ lines: 20 });
+    scrollCmd.perform({ lines: 200 });
     
     // Verify scrolled display shows different content
     display = session.display();
-    expect(display).to.include('Line 21');
+    expect(display).to.include('Line 201');
     expect(display).not.to.include('Line 1');
   });
   
