@@ -1,17 +1,19 @@
 import metamagic from 'metamagic';
 
-const stringAttr = (desc) => ({
-  description: desc,
-  validate: (val) => typeof val === 'string'
-});
-
 export default function createCommands(workspace) {
   return [
     metamagic('open', 
       ({ file }) => workspace.open(file), 
       {
         attributes: {
-          file: stringAttr('File to open')
+          file: {
+            description: 'File to open',
+            validate: (file) => typeof file === 'string'
+          }
+        },
+        example: {
+          attributes: { file: 'test.txt' },
+          description: 'Open the file test.txt'
         }
       }
     ),
@@ -20,7 +22,14 @@ export default function createCommands(workspace) {
       ({ file }) => workspace.close(file), 
       {
         attributes: {
-          file: stringAttr('File to close')
+          file: {
+            description: 'File to close',
+            validate: (file) => typeof file === 'string'
+          }
+        },
+        example: {
+          attributes: { file: 'test.txt' },
+          description: 'Close the file test.txt'
         }
       }
     ),
@@ -29,7 +38,14 @@ export default function createCommands(workspace) {
       ({ file }) => workspace.focus(file), 
       {
         attributes: {
-          file: stringAttr('File to focus on')
+          file: {
+            description: 'File to focus on',
+            validate: (file) => typeof file === 'string'
+          }
+        },
+        example: {
+          attributes: { file: 'utils.js' },
+          description: 'Focus on the file utils.js'
         }
       }
     ),
@@ -38,7 +54,14 @@ export default function createCommands(workspace) {
       ({ target }) => workspace.current().before(target), 
       {
         attributes: {
-          target: stringAttr('Text to position cursor before')
+          target: {
+            description: 'Text to position cursor before',
+            validate: (target) => typeof target === 'string'
+          }
+        },
+        example: {
+          attributes: { target: 'function' },
+          description: 'Position cursor before the first occurrence of "function"'
         }
       }
     ),
@@ -47,7 +70,14 @@ export default function createCommands(workspace) {
       ({ target }) => workspace.current().after(target), 
       {
         attributes: {
-          target: stringAttr('Text to position cursor after')
+          target: {
+            description: 'Text to position cursor after',
+            validate: (target) => typeof target === 'string'
+          }
+        },
+        example: {
+          attributes: { target: 'import' },
+          description: 'Position cursor after the first occurrence of "import"'
         }
       }
     ),
@@ -56,8 +86,18 @@ export default function createCommands(workspace) {
       ({ start, end }) => workspace.current().select(start, end), 
       {
         attributes: {
-          start: stringAttr('Start marker for text selection'),
-          end: stringAttr('End marker for text selection')
+          start: {
+            description: 'Start marker for text selection',
+            validate: (start) => typeof start === 'string'
+          },
+          end: {
+            description: 'End marker for text selection',
+            validate: (end) => typeof end === 'string'
+          }
+        },
+        example: {
+          attributes: { start: 'function', end: '}' },
+          description: 'Select text from "function" to the next "}"'
         }
       }
     ),
@@ -66,7 +106,14 @@ export default function createCommands(workspace) {
       ({ target }) => workspace.current().drag(target), 
       {
         attributes: {
-          target: stringAttr('Text to drag selection to')
+          target: {
+            description: 'Text to drag selection to',
+            validate: (target) => typeof target === 'string'
+          }
+        },
+        example: {
+          attributes: { target: ';' },
+          description: 'Select from current position to the next ";"'
         }
       }
     ),
@@ -75,7 +122,14 @@ export default function createCommands(workspace) {
       ({ content }) => workspace.current().edit(content), 
       {
         attributes: {
-          content: stringAttr('Content to replace or insert')
+          content: {
+            description: 'Content to replace or insert',
+            validate: (content) => typeof content === 'string'
+          }
+        },
+        example: {
+          attributes: { content: 'const newFunction = () => {};' },
+          description: 'Replace selected text with a new function'
         }
       }
     ),
@@ -88,6 +142,10 @@ export default function createCommands(workspace) {
             description: 'Number of lines to scroll',
             validate: (lines) => typeof lines === 'string' && !isNaN(parseInt(lines))
           }
+        },
+        example: {
+          attributes: { lines: '10' },
+          description: 'Scroll down 10 lines'
         }
       }
     )
