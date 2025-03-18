@@ -22,6 +22,6 @@
     "lovecraft": "^1.1.2"
   },
   "dependencies": {
-    "metamagic": "^0.0.3"
+    "metamagic": "^0.0.4"
   }
 }
