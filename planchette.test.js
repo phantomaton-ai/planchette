@@ -51,7 +51,7 @@ describe('Planchette', () => {
     const openCmd = cmds.find(cmd => cmd.name === 'open');
     
     // Open a file
-    await openCmd.perform({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test1.js' });
     
     // Verify the workspace display includes file content
     const display = session.display();
@@ -67,10 +67,10 @@ describe('Planchette', () => {
     const beforeCmd = cmds.find(cmd => cmd.name === 'before');
     
     // Open a file
-    await openCmd.perform({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test1.js' });
     
     // Position cursor before a specific text
-    beforeCmd.perform({ target: 'World' });
+    beforeCmd.execute({ target: 'World' });
     
     // Verify the display shows correct cursor position
     const display = session.display();
@@ -85,10 +85,10 @@ describe('Planchette', () => {
     const selectCmd = cmds.find(cmd => cmd.name === 'select');
     
     // Open a file
-    await openCmd.perform({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test1.js' });
     
     // Select text between two points
-    selectCmd.perform({ start: 'greeting', end: 'World' });
+    selectCmd.execute({ start: 'greeting', end: 'World' });
     
     // Verify the selection is displayed correctly
     const display = session.display();
@@ -104,13 +104,13 @@ describe('Planchette', () => {
     const editCmd = cmds.find(cmd => cmd.name === 'edit');
     
     // Open a file
-    await openCmd.perform({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test1.js' });
     
     // Select text
-    selectCmd.perform({ start: 'World', end: 'World' });
+    selectCmd.execute({ start: 'World', end: 'World' });
     
     // Replace it
-    await editCmd.perform({ content: 'Universe' });
+    await editCmd.execute({ content: 'Universe' });
     
     // Verify the file was modified
     const content = await fs.readFile(path.join(testDir, 'test1.js'), 'utf-8');
@@ -125,15 +125,15 @@ describe('Planchette', () => {
     const focusCmd = cmds.find(cmd => cmd.name === 'focus');
     
     // Open two files
-    await openCmd.perform({ file: 'test1.js' });
-    await openCmd.perform({ file: 'test2.txt' });
+    await openCmd.execute({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test2.txt' });
     
     // Verify test2.txt is focused (opened last)
     let display = session.display();
     expect(display).to.include('Focused: `test2.txt`');
     
     // Focus back on test1.js
-    focusCmd.perform({ file: 'test1.js' });
+    focusCmd.execute({ file: 'test1.js' });
     
     // Verify test1.js is now focused
     display = session.display();
@@ -151,11 +151,11 @@ describe('Planchette', () => {
     const closeCmd = cmds.find(cmd => cmd.name === 'close');
     
     // Open two files
-    await openCmd.perform({ file: 'test1.js' });
-    await openCmd.perform({ file: 'test2.txt' });
+    await openCmd.execute({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test2.txt' });
     
     // Close one file
-    closeCmd.perform({ file: 'test2.txt' });
+    closeCmd.execute({ file: 'test2.txt' });
     
     // Verify the file is closed and no longer in workspace
     const display = session.display();
@@ -174,14 +174,14 @@ describe('Planchette', () => {
     const scrollCmd = cmds.find(cmd => cmd.name === 'scroll');
     
     // Open the large file
-    await openCmd.perform({ file: 'large.txt' });
+    await openCmd.execute({ file: 'large.txt' });
     
     // Get initial display
     let display = session.display();
     expect(display).to.include('Line 1');
     
     // Scroll down
-    scrollCmd.perform({ lines: 200 });
+    scrollCmd.execute({ lines: 200 });
     
     // Verify scrolled display shows different content
     display = session.display();
@@ -197,13 +197,13 @@ describe('Planchette', () => {
     const dragCmd = cmds.find(cmd => cmd.name === 'drag');
     
     // Open a file
-    await openCmd.perform({ file: 'test1.js' });
+    await openCmd.execute({ file: 'test1.js' });
     
     // Position cursor at specific point
-    beforeCmd.perform({ target: 'greeting' });
+    beforeCmd.execute({ target: 'greeting' });
     
     // Drag to another point
-    dragCmd.perform({ target: 'World' });
+    dragCmd.execute({ target: 'World' });
     
     // Verify the selection
     const display = session.display();

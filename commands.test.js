@@ -40,7 +40,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(openCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(openCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
       expect(openCmd.name).to.equal('open');
       expect(openCmd.description).to.be.a('string');
       expect(openCmd.example).to.be.an('object');
@@ -53,7 +53,7 @@ describe('Commands', () => {
     });
     
     it('calls workspace.open with file parameter', () => {
-      openCmd.perform({ file: 'test.txt' });
+      openCmd.execute({ file: 'test.txt' });
       expect(workspace.open.calledOnce).to.be.true;
       expect(workspace.open.firstCall.args[0]).to.equal('test.txt');
     });
@@ -67,7 +67,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(closeCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(closeCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates file parameter', () => {
@@ -77,7 +77,7 @@ describe('Commands', () => {
     });
     
     it('calls workspace.close with file parameter', () => {
-      closeCmd.perform({ file: 'test.txt' });
+      closeCmd.execute({ file: 'test.txt' });
       expect(workspace.close.calledOnce).to.be.true;
       expect(workspace.close.firstCall.args[0]).to.equal('test.txt');
     });
@@ -91,7 +91,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(focusCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(focusCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates file parameter', () => {
@@ -101,7 +101,7 @@ describe('Commands', () => {
     });
     
     it('calls workspace.focus with file parameter', () => {
-      focusCmd.perform({ file: 'test.txt' });
+      focusCmd.execute({ file: 'test.txt' });
       expect(workspace.focus.calledOnce).to.be.true;
       expect(workspace.focus.firstCall.args[0]).to.equal('test.txt');
     });
@@ -115,7 +115,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(beforeCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(beforeCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates target parameter', () => {
@@ -125,7 +125,7 @@ describe('Commands', () => {
     });
     
     it('calls window.before with target parameter', () => {
-      beforeCmd.perform({ target: 'function' });
+      beforeCmd.execute({ target: 'function' });
       expect(workspace.current.calledOnce).to.be.true;
       expect(window.before.calledOnce).to.be.true;
       expect(window.before.firstCall.args[0]).to.equal('function');
@@ -140,7 +140,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(afterCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(afterCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates target parameter', () => {
@@ -150,7 +150,7 @@ describe('Commands', () => {
     });
     
     it('calls window.after with target parameter', () => {
-      afterCmd.perform({ target: 'import' });
+      afterCmd.execute({ target: 'import' });
       expect(window.after.calledOnce).to.be.true;
       expect(window.after.firstCall.args[0]).to.equal('import');
     });
@@ -164,7 +164,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(selectCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(selectCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates start and end parameters', () => {
@@ -177,7 +177,7 @@ describe('Commands', () => {
     });
     
     it('calls window.select with start and end parameters', () => {
-      selectCmd.perform({ start: 'function', end: '}' });
+      selectCmd.execute({ start: 'function', end: '}' });
       expect(window.select.calledOnce).to.be.true;
       expect(window.select.firstCall.args[0]).to.equal('function');
       expect(window.select.firstCall.args[1]).to.equal('}');
@@ -192,7 +192,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(dragCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(dragCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates target parameter', () => {
@@ -202,7 +202,7 @@ describe('Commands', () => {
     });
     
     it('calls window.drag with target parameter', () => {
-      dragCmd.perform({ target: ';' });
+      dragCmd.execute({ target: ';' });
       expect(window.drag.calledOnce).to.be.true;
       expect(window.drag.firstCall.args[0]).to.equal(';');
     });
@@ -216,7 +216,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(editCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(editCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates content parameter', () => {
@@ -227,7 +227,7 @@ describe('Commands', () => {
     
     it('calls window.edit with content parameter', () => {
       const content = 'const newFunction = () => {};';
-      editCmd.perform({ content });
+      editCmd.execute({ content });
       expect(window.edit.calledOnce).to.be.true;
       expect(window.edit.firstCall.args[0]).to.equal(content);
     });
@@ -241,7 +241,7 @@ describe('Commands', () => {
     });
     
     it('has the correct properties', () => {
-      expect(scrollCmd).to.include.keys('name', 'description', 'example', 'perform', 'validate');
+      expect(scrollCmd).to.include.keys('name', 'description', 'example', 'execute', 'validate');
     });
     
     it('validates lines parameter', () => {
@@ -252,7 +252,7 @@ describe('Commands', () => {
     });
     
     it('calls window.scroll with lines parameter', () => {
-      scrollCmd.perform({ lines: '10' });
+      scrollCmd.execute({ lines: '10' });
       expect(window.scroll.calledOnce).to.be.true;
       expect(window.scroll.firstCall.args[0]).to.equal(10);
     });

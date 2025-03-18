@@ -35,7 +35,7 @@ describe('Session', () => {
       
       // Check that each command has the required properties
       cmds.forEach(cmd => {
-        expect(cmd).to.have.all.keys('name', 'description', 'example', 'perform', 'validate');
+        expect(cmd).to.have.all.keys('name', 'description', 'example', 'execute', 'validate');
       });
     });
   });

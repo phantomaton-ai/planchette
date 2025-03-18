@@ -20,5 +20,8 @@
   "type": "module",
   "devDependencies": {
     "lovecraft": "^1.1.2"
+  },
+  "dependencies": {
+    "metamagic": "^0.0.1"
   }
 }
