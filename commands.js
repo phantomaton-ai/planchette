@@ -1,94 +1,153 @@
-const commands = workspace => [
-  {
-    name: 'open',
-    description: 'Open the specified file in the current Workspace',
-    example: {
-      description: 'Open the file test.txt',
-      options: { file: 'test.txt' }
-    },
-    perform: ({ file }) => workspace.open(file),
-    validate: ({ file }) => typeof file === 'string',
-  },
-  {
-    name: 'close',
-    description: 'Close the specified file in the current Workspace',
-    example: {
-      description: 'Close the file test.txt',
-      options: { file: 'test.txt' }
-    },
-    perform: ({ file }) => workspace.close(file),
-    validate: ({ file }) => typeof file === 'string',
-  },
-  {
-    name: 'focus',
-    description: 'Focus on a specific file in the current Workspace',
-    example: {
-      description: 'Focus on the file utils.js',
-      options: { file: 'utils.js' }
-    },
-    perform: ({ file }) => workspace.focus(file),
-    validate: ({ file }) => typeof file === 'string',
-  },
-  {
-    name: 'before',
-    description: 'Position the cursor before specified text in the focused Window',
-    example: {
-      description: 'Position cursor before the first occurrence of "function"',
-      options: { target: 'function' }
-    },
-    perform: ({ target }) => workspace.current().before(target),
-    validate: ({ target }) => typeof target === 'string',
-  },
-  {
-    name: 'after',
-    description: 'Position the cursor after specified text in the focused Window',
-    example: {
-      description: 'Position cursor after the first occurrence of "import"',
-      options: { target: 'import' }
-    },
-    perform: ({ target }) => workspace.current().after(target),
-    validate: ({ target }) => typeof target === 'string',
-  },
-  {
-    name: 'select',
-    description: 'Select text between start and end markers in the focused Window',
-    example: {
-      description: 'Select text from "function" to the next "}"',
-      options: { start: 'function', end: '}' }
-    },
-    perform: ({ start, end }) => workspace.current().select(start, end),
-    validate: ({ start, end }) => typeof start === 'string' && typeof end === 'string',
-  },
-  {
-    name: 'drag',
-    description: 'Select text from current cursor position to specified target in the focused Window',
-    example: {
-      description: 'Select from current position to the next ";"',
-      options: { target: ';' }
-    },
-    perform: ({ target }) => workspace.current().drag(target),
-    validate: ({ target }) => typeof target === 'string',
-  },
-  {
-    name: 'edit',
-    description: 'Replace selected text or insert at cursor in the focused Window',
-    example: {
-      description: 'Replace selected text with "const newFunction = () => {};"',
-      options: { content: 'const newFunction = () => {};' }
-    },
-    perform: ({ content }) => workspace.current().edit(content),
-    validate: ({ content }) => typeof content === 'string',
-  },
-  {
-    name: 'scroll',
-    description: 'Scroll the focused Window up or down by specified lines',
-    example: {
-      description: 'Scroll down 10 lines',
-      options: { lines: 10 }
-    },
-    perform: ({ lines }) => workspace.current().scroll(parseInt(lines)),
-    validate: ({ lines }) => typeof lines === 'string' && !isNaN(parseInt(lines)),
-  }
-];
+import metamagic from 'metamagic';
 
-export default commands;
+export default function createCommands(workspace) {
+  return [
+    metamagic('open', 
+      ({ file }) => workspace.open(file), 
+      {
+        attributes: {
+          file: {
+            description: 'File to open',
+            validate: (file) => typeof file === 'string'
+          }
+        },
+        example: {
+          attributes: { file: 'test.txt' },
+          description: 'Open the file test.txt'
+        }
+      }
+    ),
+
+    metamagic('close', 
+      ({ file }) => workspace.close(file), 
+      {
+        attributes: {
+          file: {
+            description: 'File to close',
+            validate: (file) => typeof file === 'string'
+          }
+        },
+        example: {
+          attributes: { file: 'test.txt' },
+          description: 'Close the file test.txt'
+        }
+      }
+    ),
+
+    metamagic('focus', 
+      ({ file }) => workspace.focus(file), 
+      {
+        attributes: {
+          file: {
+            description: 'File to focus on',
+            validate: (file) => typeof file === 'string'
+          }
+        },
+        example: {
+          attributes: { file: 'utils.js' },
+          description: 'Focus on the file utils.js'
+        }
+      }
+    ),
+
+    metamagic('before', 
+      ({ target }) => workspace.current().before(target), 
+      {
+        attributes: {
+          target: {
+            description: 'Text to position cursor before',
+            validate: (target) => typeof target === 'string'
+          }
+        },
+        example: {
+          attributes: { target: 'function' },
+          description: 'Position cursor before the first occurrence of "function"'
+        }
+      }
+    ),
+
+    metamagic('after', 
+      ({ target }) => workspace.current().after(target), 
+      {
+        attributes: {
+          target: {
+            description: 'Text to position cursor after',
+            validate: (target) => typeof target === 'string'
+          }
+        },
+        example: {
+          attributes: { target: 'import' },
+          description: 'Position cursor after the first occurrence of "import"'
+        }
+      }
+    ),
+
+    metamagic('select', 
+      ({ start, end }) => workspace.current().select(start, end), 
+      {
+        attributes: {
+          start: {
+            description: 'Start marker for text selection',
+            validate: (start) => typeof start === 'string'
+          },
+          end: {
+            description: 'End marker for text selection',
+            validate: (end) => typeof end === 'string'
+          }
+        },
+        example: {
+          attributes: { start: 'function', end: '}' },
+          description: 'Select text from "function" to the next "}"'
+        }
+      }
+    ),
+
+    metamagic('drag', 
+      ({ target }) => workspace.current().drag(target), 
+      {
+        attributes: {
+          target: {
+            description: 'Text to drag selection to',
+            validate: (target) => typeof target === 'string'
+          }
+        },
+        example: {
+          attributes: { target: ';' },
+          description: 'Select from current position to the next ";"'
+        }
+      }
+    ),
+
+    metamagic('edit', 
+      ({ content }) => workspace.current().edit(content), 
+      {
+        attributes: {
+          content: {
+            description: 'Content to replace or insert',
+            validate: (content) => typeof content === 'string'
+          }
+        },
+        example: {
+          attributes: { content: 'const newFunction = () => {};' },
+          description: 'Replace selected text with a new function'
+        }
+      }
+    ),
+
+    metamagic('scroll', 
+      ({ lines }) => workspace.current().scroll(parseInt(lines)), 
+      {
+        attributes: {
+          lines: {
+            description: 'Number of lines to scroll',
+            validate: (lines) => typeof lines === 'string' && !isNaN(parseInt(lines))
+          }
+        },
+        example: {
+          attributes: { lines: '10' },
+          description: 'Scroll down 10 lines'
+        }
+      }
+    )
+  ];
+}
