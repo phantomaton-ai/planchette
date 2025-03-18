@@ -8,7 +8,7 @@ export default function createCommands(workspace) {
       'open', 
       ({ file }) => workspace.open(file), 
       {
-        attributes: { file: { description: 'File to open' } },
+        attributes: { file: 'File to open' },
         description: 'Open the specified file in the current Workspace',
         example: {
           attributes: { file: 'test.txt' },
